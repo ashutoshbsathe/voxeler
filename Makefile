@@ -5,14 +5,14 @@ LIBS=$(OPENGLLIB) $(GLEWLIB) $(GLFWLIB)
 LDFLAGS=-L/usr/local/lib 
 CPPFLAGS=-I/usr/local/include
 
-BIN1=01_triangle
-SRCS1=01_triangle.cpp gl_framework.cpp shader_util.cpp 
+BIN=a1model
+SRCS=main.cpp gl_framework.cpp shader_util.cpp 
 INCLUDES=gl_framework.hpp shader_util.hpp
 
-all: $(BIN1)
+all: $(BIN)
 
-$(BIN1): $(SRCS1) $(INCLUDES)
-	g++ $(CPPFLAGS) $(SRCS1) -o $(BIN1) $(LDFLAGS) $(LIBS)
+$(BIN): $(SRCS) $(INCLUDES)
+	g++ $(CPPFLAGS) $(SRCS) -o $(BIN) $(LDFLAGS) $(LIBS)
 
 clean:
 	rm -f *~ *.o $(BIN1) $(BIN2)

@@ -52,7 +52,7 @@ void renderGL(void)
   glBindVertexArray (vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_LINE_LOOP, 0, 3);
 }
 
 int main(int argc, char** argv)
