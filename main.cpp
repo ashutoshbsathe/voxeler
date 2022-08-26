@@ -31,7 +31,7 @@ void defineGrid() {
         points[idx++] = coords[N_CELLS][i][0]; // x coord 
         points[idx++] = coords[N_CELLS][i][1]; // y coord 
     }
-    std::cout << idx;
+    std::cout << "Last idx = " << idx << "\n";
 }
 
 GLuint shaderProgram;
