@@ -1,13 +1,38 @@
 #include "gl_framework.hpp"
 #include "shader_util.hpp"
 #include "main.hpp"
-
+/*
 float points[] = {
     -0.95f,  0.95f, 0.0f,
      0.95f,  0.95f, 0.0f,
      0.95f, -0.95f, 0.0f,
     -0.95f, -0.95f, 0.0f
   };
+*/
+float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
+void defineGrid() {
+    float coords[N_CELLS+1][N_CELLS+1][2];
+    for(int i = 0; i <= N_CELLS; i++) {
+        for(int j = 0; j <= N_CELLS; j++) {
+            coords[i][j][0] = DRAW_MIN + i * (DRAW_MAX - DRAW_MIN) / N_CELLS;
+            coords[i][j][1] = DRAW_MIN + j * (DRAW_MAX - DRAW_MIN) / N_CELLS;
+        }
+    }
+    int idx = 0;
+    for(int i = 0; i <= N_CELLS; i++) {
+        points[idx++] = coords[i][0][0]; // x coord 
+        points[idx++] = coords[i][0][1]; // y coord 
+        points[idx++] = coords[i][N_CELLS][0]; // x coord 
+        points[idx++] = coords[i][N_CELLS][1]; // y coord 
+    }
+    for(int i = 0; i <= N_CELLS; i++) {
+        points[idx++] = coords[0][i][0]; // x coord 
+        points[idx++] = coords[0][i][1]; // y coord 
+        points[idx++] = coords[N_CELLS][i][0]; // x coord 
+        points[idx++] = coords[N_CELLS][i][1]; // y coord 
+    }
+    std::cout << idx;
+}
 
 GLuint shaderProgram;
 GLuint vbo, vao;
@@ -32,7 +57,7 @@ void initVertexBufferGL(void)
   //Set it as the current buffer to be used by binding it
   glBindBuffer (GL_ARRAY_BUFFER, vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
-  glBufferData (GL_ARRAY_BUFFER, 12 * sizeof (float), points, GL_STATIC_DRAW);
+  glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
 
   //Ask GL for a Vertex Attribute Object (vao)
   glGenVertexArrays (1, &vao);
@@ -42,7 +67,7 @@ void initVertexBufferGL(void)
   glEnableVertexAttribArray (0);
   //This the layout of our first vertex buffer
   //"0" means define the layout for attribute number 0. "3" means that the variables are vec3 made from every 3 floats 
-  glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 void renderGL(void)
@@ -54,11 +79,12 @@ void renderGL(void)
   glBindVertexArray (vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
-  glDrawArrays(GL_LINE_LOOP, 0, 4);
+  glDrawArrays(GL_LINES, 0, 4*(N_CELLS+1));
 }
 
 int main(int argc, char** argv)
 {
+  defineGrid();
   //! The pointer to the GLFW window
   GLFWwindow* window;
 
