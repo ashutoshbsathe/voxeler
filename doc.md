@@ -24,6 +24,8 @@ Now use instanced draw call to :
 1. For each instance, calculate the Z value the same way we calculated coords of intermediate points but with instanceID as the index and then set the Z value 
 2. Once instanceID = N+1, interprete the input pair as (Y,Z) instead of (X,Y) and control X instead of Z. Similarly, when instanceID = 2(N+1), change the interpretation again
 
+More ref: https://learnopengl.com/Advanced-OpenGL/Instancing
+
 # Cube
 * https://www.khronos.org/opengl/wiki/Primitive (GL_PATCHES)
 * https://www.khronos.org/opengl/wiki/Tessellation#Patches
