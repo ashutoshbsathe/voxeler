@@ -1,5 +1,5 @@
 #include "gl_framework.hpp"
-
+extern GLfloat xrot, yrot, zrot, rotamount;
 namespace csX75
 {
   //! Initialize GL State
@@ -36,6 +36,24 @@ namespace csX75
     //!Close the window if the ESC key was pressed
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
+    else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+        yrot -= rotamount;
+    }
+    else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+        yrot += rotamount;
+    }
+    else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        xrot -= rotamount;
+    }
+    else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        xrot += rotamount;
+    }
+    else if(key == GLFW_KEY_LEFT_BRACKET && action == GLFW_PRESS) {
+        zrot -= rotamount;
+    }
+    else if(key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS) {
+        zrot += rotamount;
+    }
   }
 };  
   

@@ -18,6 +18,6 @@
 // each cube is N_UNITS x N_UNITS x N_UNITS
 #define N_UNITS 5
 
-GLfloat xrot = 0, yrot = 0, zrot = 0;
+GLfloat xrot = 0, yrot = 0, zrot = 0, rotamount = 0.1;
 
 #endif
