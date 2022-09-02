@@ -1,5 +1,3 @@
-#include "gl_framework.hpp"
-#include "shader_util.hpp"
 #include "main.hpp"
 /*
 float points[] = {
@@ -47,6 +45,12 @@ GLuint shaderProgram;
 GLuint vbo, vao;
 GLuint grid_offset_id;
 
+glm::mat4 rotation_matrix;
+glm::mat4 view_matrix;
+glm::mat4 ortho_matrix;
+glm::mat4 modelviewproject_matrix;
+GLuint uModelViewProjectMatrix_id;
+
 void initShadersGL(void)
 {
   std::string vertex_shader_file("grid_vs.glsl");
@@ -58,6 +62,7 @@ void initShadersGL(void)
 
   shaderProgram = csX75::CreateProgramGL(shaderList);
   grid_offset_id = glGetUniformLocation(shaderProgram, "grid_offsets"); 
+  uModelViewProjectMatrix_id = glGetUniformLocation(shaderProgram, "uModelViewProjectMatrix"); 
 }
 
 void initVertexBufferGL(void)
@@ -87,8 +92,20 @@ void renderGL(void)
   glUseProgram(shaderProgram);
 
   glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
+  
+  rotation_matrix = glm::rotate(glm::mat4(1.0f), xrot, glm::vec3(1.0f,0.0f,0.0f));
+  rotation_matrix = glm::rotate(rotation_matrix, yrot, glm::vec3(0.0f,1.0f,0.0f));
+  rotation_matrix = glm::rotate(rotation_matrix, zrot, glm::vec3(0.0f,0.0f,1.0f));
+  
+  view_matrix = glm::lookAt(glm::vec3(0.0,0.0,-2.0),glm::vec3(0.0,0.0,0.0),glm::vec3(0.0,1.0,0.0));
+  
+  ortho_matrix = glm::ortho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
 
-  glBindVertexArray (vao);
+  modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
+
+  glUniformMatrix4fv(uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
+  
+  glBindVertexArray(vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
   glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
