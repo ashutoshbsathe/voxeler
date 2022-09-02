@@ -27,12 +27,14 @@ void defineGrid() {
         points[idx++] = coords[i][N_CELLS][0]; // x coord 
         points[idx++] = coords[i][N_CELLS][1]; // y coord 
     }
+    /*
     for(int i = 0; i <= N_CELLS; i++) {
         points[idx++] = coords[0][i][0]; // x coord 
         points[idx++] = coords[0][i][1]; // y coord 
         points[idx++] = coords[N_CELLS][i][0]; // x coord 
         points[idx++] = coords[N_CELLS][i][1]; // y coord 
     }
+    */
     std::cout << "Last idx = " << idx << "\n";
     // prepare `grid_offsets` which will be passed as a uniform 
     grid_offsets[0] = N_CELLS;
@@ -89,7 +91,7 @@ void renderGL(void)
   glBindVertexArray (vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
-  glDrawArraysInstanced(GL_LINES, 0, 4*(N_CELLS+1), N_CELLS+1);
+  glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
 }
 
 int main(int argc, char** argv)
