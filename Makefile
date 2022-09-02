@@ -15,4 +15,4 @@ $(BIN): $(SRCS) $(INCLUDES)
 	g++ $(CPPFLAGS) $(SRCS) -o $(BIN) $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *~ *.o $(BIN1) $(BIN2)
+	rm -f *~ *.o $(BIN)
