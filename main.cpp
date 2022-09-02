@@ -49,8 +49,8 @@ GLuint grid_offset_id;
 
 void initShadersGL(void)
 {
-  std::string vertex_shader_file("simple_vs.glsl");
-  std::string fragment_shader_file("simple_fs.glsl");
+  std::string vertex_shader_file("grid_vs.glsl");
+  std::string fragment_shader_file("grid_fs.glsl");
 
   std::vector<GLuint> shaderList;
   shaderList.push_back(csX75::LoadShaderGL(GL_VERTEX_SHADER, vertex_shader_file));

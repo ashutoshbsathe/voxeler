@@ -1,11 +1,11 @@
 #version 330
-#ifndef MAX_N_SIZE 
-#define MAX_N_SIZE 102
+#ifndef MAX_N_CELLS
+#define MAX_N_CELLS 102
 #endif
 
 in vec2 vp;
 
-uniform float grid_offsets[MAX_N_SIZE];
+uniform float grid_offsets[MAX_N_CELLS];
 
 void main () 
 {
