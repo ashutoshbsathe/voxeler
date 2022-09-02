@@ -10,6 +10,8 @@ float points[] = {
   };
 */
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
+float grid_offsets[N_CELLS+2];
+
 void defineGrid() {
     float coords[N_CELLS+1][N_CELLS+1][2];
     for(int i = 0; i <= N_CELLS; i++) {
@@ -32,10 +34,16 @@ void defineGrid() {
         points[idx++] = coords[N_CELLS][i][1]; // y coord 
     }
     std::cout << "Last idx = " << idx << "\n";
+    // prepare `grid_offsets` which will be passed as a uniform 
+    grid_offsets[0] = N_CELLS;
+    for(int i = 1; i <= N_CELLS+1; i++) {
+        grid_offsets[i] = DRAW_MIN + (i-1) * (DRAW_MAX - DRAW_MIN) / N_CELLS;
+    }
 }
 
 GLuint shaderProgram;
 GLuint vbo, vao;
+GLuint grid_offset_id;
 
 void initShadersGL(void)
 {
@@ -47,7 +55,7 @@ void initShadersGL(void)
   shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
 
   shaderProgram = csX75::CreateProgramGL(shaderList);
-  
+  grid_offset_id = glGetUniformLocation(shaderProgram, "grid_offsets"); 
 }
 
 void initVertexBufferGL(void)
@@ -76,10 +84,12 @@ void renderGL(void)
 
   glUseProgram(shaderProgram);
 
+  glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
+
   glBindVertexArray (vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
-  glDrawArrays(GL_LINES, 0, 4*(N_CELLS+1));
+  glDrawArraysInstanced(GL_LINES, 0, 4*(N_CELLS+1), N_CELLS+1);
 }
 
 int main(int argc, char** argv)
