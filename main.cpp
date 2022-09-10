@@ -41,17 +41,18 @@ void defineGrid() {
     }
 }
 
-GLuint grid_shader_program;
-GLuint grid_vbo, grid_vao;
-GLuint grid_offset_id;
+GLuint grid_shader_program, cursor_shader_program;
+GLuint grid_vbo, grid_vao, cursor_vbo, cursor_vao;
+
+GLuint grid_offset_id, cursor_offset_id;
 
 glm::mat4 rotation_matrix;
 glm::mat4 view_matrix;
 glm::mat4 ortho_matrix;
 glm::mat4 modelviewproject_matrix;
-GLuint uModelViewProjectMatrix_id;
+GLuint grid_uModelViewProjectMatrix_id, cursor_uModelViewProjectMatrix_id;
 
-void initShadersGL(void)
+void gridInitShadersGL(void)
 {
   std::string vertex_shader_file("grid_vs.glsl");
   std::string fragment_shader_file("grid_fs.glsl");
@@ -61,11 +62,25 @@ void initShadersGL(void)
   shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
 
   grid_shader_program = csX75::CreateProgramGL(shaderList);
-  grid_offset_id = glGetUniformLocation(grid_shader_program, "grid_offsets"); 
-  uModelViewProjectMatrix_id = glGetUniformLocation(grid_shader_program, "uModelViewProjectMatrix"); 
+  grid_offset_id = glGetUniformLocation(grid_shader_program, "grid_offsets");
+  grid_uModelViewProjectMatrix_id = glGetUniformLocation(grid_shader_program, "uModelViewProjectMatrix");
 }
 
-void initVertexBufferGL(void)
+void cursorInitShadersGL(void)
+{
+  std::string vertex_shader_file("cursor_vs.glsl");
+  std::string fragment_shader_file("cursor_fs.glsl");
+
+  std::vector<GLuint> shaderList;
+  shaderList.push_back(csX75::LoadShaderGL(GL_VERTEX_SHADER, vertex_shader_file));
+  shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
+
+  cursor_shader_program = csX75::CreateProgramGL(shaderList);
+  cursor_offset_id = glGetUniformLocation(grid_shader_program, "grid_offsets");
+  cursor_uModelViewProjectMatrix_id = glGetUniformLocation(cursor_shader_program, "uModelViewProjectMatrix");
+}
+
+void gridInitVertexBufferGL(void)
 {
   //Ask GL for a Vertex Buffer Object (grid_vbo)
   glGenBuffers (1, &grid_vbo);
@@ -85,13 +100,29 @@ void initVertexBufferGL(void)
   glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
+void cursorInitVertexBufferGL(void)
+{
+  //Ask GL for a Vertex Buffer Object (cursor_vbo)
+  glGenBuffers (1, &cursor_vbo);
+  //Set it as the current buffer to be used by binding it
+  glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
+  //Copy the points into the current buffer - 9 float values, start pointer and static data
+  glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
+
+  //Ask GL for a Vertex Attribute Object (cursor_vao)
+  glGenVertexArrays (1, &cursor_vao);
+  //Set it as the current array to be used by binding it
+  glBindVertexArray (cursor_vao);
+  //Enable the vertex attribute
+  glEnableVertexAttribArray (0);
+  //This the layout of our first vertex buffer
+  //"0" means define the layout for attribute number 0. "3" means that the variables are vec3 made from every 3 floats 
+  glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+}
+
 void renderGL(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  glUseProgram(grid_shader_program);
-
-  glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
   
   rotation_matrix = glm::rotate(glm::mat4(1.0f), xrot, glm::vec3(1.0f,0.0f,0.0f));
   rotation_matrix = glm::rotate(rotation_matrix, yrot, glm::vec3(0.0f,1.0f,0.0f));
@@ -103,12 +134,24 @@ void renderGL(void)
 
   modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
 
-  glUniformMatrix4fv(uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
-  
+  // Drawing the grid first 
+  /*
+  glBindBuffer (GL_ARRAY_BUFFER, grid_vbo);
+  glUseProgram(grid_shader_program);
+  glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
+  glUniformMatrix4fv(grid_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glBindVertexArray(grid_vao);
-
-  // Draw points 0-3 from the currently bound VAO with current in-use shader
   glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
+  */
+  // Draw the cursor cube 
+  glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
+  glUseProgram(cursor_shader_program);
+  glUniform1fv(cursor_offset_id, N_CELLS + 2, grid_offsets);
+  glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
+  glBindVertexArray(cursor_vao);
+  glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
+
+  // Finally draw the model
 }
 
 int main(int argc, char** argv)
@@ -169,8 +212,10 @@ int main(int argc, char** argv)
 
   //Initialize GL state
   csX75::initGL();
-  initShadersGL();
-  initVertexBufferGL();
+  gridInitShadersGL();
+  gridInitVertexBufferGL();
+  cursorInitShadersGL();
+  cursorInitVertexBufferGL();
 
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0)
