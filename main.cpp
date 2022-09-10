@@ -9,7 +9,12 @@ float points[] = {
 */
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
 float grid_offsets[N_CELLS+2];
-
+float cursor_points[] {
+    -0.95f,  0.95f, 0.0f,
+     0.95f,  0.95f, 0.0f,
+     0.95f, -0.95f, 0.0f,
+    -0.95f, -0.95f, 0.0f
+};
 void defineGrid() {
     float coords[N_CELLS+1][N_CELLS+1][2];
     for(int i = 0; i <= N_CELLS; i++) {
@@ -111,13 +116,13 @@ void cursorInitVertexBufferGL(void)
   //Set it as the current buffer to be used by binding it
   glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
-  glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
+  glBufferData (GL_ARRAY_BUFFER, 9 * sizeof (float), cursor_points, GL_STATIC_DRAW);
 
   //Enable the vertex attribute
   glEnableVertexAttribArray (0);
   //This the layout of our first vertex buffer
   //"0" means define the layout for attribute number 0. "3" means that the variables are vec3 made from every 3 floats 
-  glVertexAttribPointer (0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 
 void renderGL(void)
@@ -135,20 +140,17 @@ void renderGL(void)
   modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
 
   // Drawing the grid first 
-  glBindVertexArray(grid_vao);  
   glUseProgram(grid_shader_program);
+  glBindVertexArray(grid_vao);
   glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
   glUniformMatrix4fv(grid_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
-  glBindVertexArray(grid_vao);
   glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
   
   // Draw the cursor cube
-  glBindVertexArray(cursor_vao);
   glUseProgram(cursor_shader_program);
-  glUniform1fv(cursor_offset_id, N_CELLS + 2, grid_offsets);
-  glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glBindVertexArray(cursor_vao);
-  glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
+  glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
+  glDrawArrays(GL_TRIANGLES, 0, 3);
 
   // Finally draw the model
 }
