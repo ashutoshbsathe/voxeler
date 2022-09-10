@@ -41,8 +41,8 @@ void defineGrid() {
     }
 }
 
-GLuint shaderProgram;
-GLuint vbo, vao;
+GLuint grid_shader_program;
+GLuint grid_vbo, grid_vao;
 GLuint grid_offset_id;
 
 glm::mat4 rotation_matrix;
@@ -60,24 +60,24 @@ void initShadersGL(void)
   shaderList.push_back(csX75::LoadShaderGL(GL_VERTEX_SHADER, vertex_shader_file));
   shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
 
-  shaderProgram = csX75::CreateProgramGL(shaderList);
-  grid_offset_id = glGetUniformLocation(shaderProgram, "grid_offsets"); 
-  uModelViewProjectMatrix_id = glGetUniformLocation(shaderProgram, "uModelViewProjectMatrix"); 
+  grid_shader_program = csX75::CreateProgramGL(shaderList);
+  grid_offset_id = glGetUniformLocation(grid_shader_program, "grid_offsets"); 
+  uModelViewProjectMatrix_id = glGetUniformLocation(grid_shader_program, "uModelViewProjectMatrix"); 
 }
 
 void initVertexBufferGL(void)
 {
-  //Ask GL for a Vertex Buffer Object (vbo)
-  glGenBuffers (1, &vbo);
+  //Ask GL for a Vertex Buffer Object (grid_vbo)
+  glGenBuffers (1, &grid_vbo);
   //Set it as the current buffer to be used by binding it
-  glBindBuffer (GL_ARRAY_BUFFER, vbo);
+  glBindBuffer (GL_ARRAY_BUFFER, grid_vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
   glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
 
-  //Ask GL for a Vertex Attribute Object (vao)
-  glGenVertexArrays (1, &vao);
+  //Ask GL for a Vertex Attribute Object (grid_vao)
+  glGenVertexArrays (1, &grid_vao);
   //Set it as the current array to be used by binding it
-  glBindVertexArray (vao);
+  glBindVertexArray (grid_vao);
   //Enable the vertex attribute
   glEnableVertexAttribArray (0);
   //This the layout of our first vertex buffer
@@ -89,7 +89,7 @@ void renderGL(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glUseProgram(shaderProgram);
+  glUseProgram(grid_shader_program);
 
   glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
   
@@ -105,7 +105,7 @@ void renderGL(void)
 
   glUniformMatrix4fv(uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   
-  glBindVertexArray(vao);
+  glBindVertexArray(grid_vao);
 
   // Draw points 0-3 from the currently bound VAO with current in-use shader
   glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
