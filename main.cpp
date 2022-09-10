@@ -82,6 +82,10 @@ void cursorInitShadersGL(void)
 
 void gridInitVertexBufferGL(void)
 {
+  //Ask GL for a Vertex Attribute Object (grid_vao)
+  glGenVertexArrays (1, &grid_vao);
+  //Set it as the current array to be used by binding it
+  glBindVertexArray (grid_vao);
   //Ask GL for a Vertex Buffer Object (grid_vbo)
   glGenBuffers (1, &grid_vbo);
   //Set it as the current buffer to be used by binding it
@@ -89,10 +93,6 @@ void gridInitVertexBufferGL(void)
   //Copy the points into the current buffer - 9 float values, start pointer and static data
   glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
 
-  //Ask GL for a Vertex Attribute Object (grid_vao)
-  glGenVertexArrays (1, &grid_vao);
-  //Set it as the current array to be used by binding it
-  glBindVertexArray (grid_vao);
   //Enable the vertex attribute
   glEnableVertexAttribArray (0);
   //This the layout of our first vertex buffer
@@ -102,6 +102,10 @@ void gridInitVertexBufferGL(void)
 
 void cursorInitVertexBufferGL(void)
 {
+  //Ask GL for a Vertex Attribute Object (cursor_vao)
+  glGenVertexArrays (1, &cursor_vao);
+  //Set it as the current array to be used by binding it
+  glBindVertexArray (cursor_vao);
   //Ask GL for a Vertex Buffer Object (cursor_vbo)
   glGenBuffers (1, &cursor_vbo);
   //Set it as the current buffer to be used by binding it
@@ -109,10 +113,6 @@ void cursorInitVertexBufferGL(void)
   //Copy the points into the current buffer - 9 float values, start pointer and static data
   glBufferData (GL_ARRAY_BUFFER, 8 * (N_CELLS+1) * sizeof (float), points, GL_STATIC_DRAW);
 
-  //Ask GL for a Vertex Attribute Object (cursor_vao)
-  glGenVertexArrays (1, &cursor_vao);
-  //Set it as the current array to be used by binding it
-  glBindVertexArray (cursor_vao);
   //Enable the vertex attribute
   glEnableVertexAttribArray (0);
   //This the layout of our first vertex buffer
@@ -135,16 +135,15 @@ void renderGL(void)
   modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
 
   // Drawing the grid first 
-  /*
-  glBindBuffer (GL_ARRAY_BUFFER, grid_vbo);
+  glBindVertexArray(grid_vao);  
   glUseProgram(grid_shader_program);
   glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
   glUniformMatrix4fv(grid_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glBindVertexArray(grid_vao);
   glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
-  */
-  // Draw the cursor cube 
-  glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
+  
+  // Draw the cursor cube
+  glBindVertexArray(cursor_vao);
   glUseProgram(cursor_shader_program);
   glUniform1fv(cursor_offset_id, N_CELLS + 2, grid_offsets);
   glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
