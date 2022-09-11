@@ -6,6 +6,11 @@
 
 #include <iostream>
 
+// From Tutorial_02
+// Define a helpful macro for handling offsets into buffer objects
+#define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))
+
+
 namespace csX75
 {
   //! Initialize GL State

@@ -15,7 +15,7 @@
 // each cube is N_UNITS x N_UNITS x N_UNITS
 #define N_UNITS 5
 
-#define VIEW_PADDING (1.75)
+#define VIEW_PADDING (1.1)
 
 #define DRAW_MIN (-(N_CELLS*N_UNITS)/2)
 #define DRAW_MAX ((N_CELLS*N_UNITS)/2)

@@ -1,4 +1,5 @@
 #include "main.hpp"
+
 /*
 float points[] = {
     -0.95f,  0.95f, 0.0f,
@@ -49,7 +50,7 @@ void defineGrid() {
 GLuint grid_shader_program, cursor_shader_program;
 GLuint grid_vbo, grid_vao, cursor_vbo, cursor_vao;
 
-GLuint grid_offset_id, cursor_offset_id;
+GLuint grid_offset_id, cursor_position_id, cursor_color_id;
 
 glm::mat4 rotation_matrix;
 glm::mat4 view_matrix;
@@ -57,6 +58,79 @@ glm::mat4 ortho_matrix;
 glm::mat4 projection_matrix;
 glm::mat4 modelviewproject_matrix;
 GLuint grid_uModelViewProjectMatrix_id, cursor_uModelViewProjectMatrix_id;
+
+float cube_coords[36*3];
+float cube_colors[12*3] = {
+    183/255.0, 28/255.0, 28/255.0,
+    136/255.0, 14/255.0, 79/255.0,
+    179/255.0, 136/255.0, 255/255.0,
+    74/255.0, 20/255.0, 140/255.0,
+    140/255.0, 158/255.0, 255/255.0,
+    83/255.0, 109/255.0, 254/255.0,
+    100/255.0, 255/255.0, 218/255.0,
+    29/255.0, 233/255.0, 182/255.0,
+    238/255.0, 255/255.0, 65/255.0,
+    198/255.0, 255/255.0, 0/255.0,
+    158/255.0, 158/255.0, 158/255.0,
+    238/255.0, 238/255.0, 238/255.0,
+};
+void cubeAt(float x, float y, float z) {
+    // 6 faces, 12 triangles, 36 vertices, 36 * 3 coords
+    // cube's left bottom back is at (x, y, z)
+    float temp[36*3] = {
+        x, y, z,
+        x+N_UNITS, y, z,
+        x+N_UNITS, y+N_UNITS, z,
+
+        x, y, z,
+        x+N_UNITS, y+N_UNITS, z,
+        x, y+N_UNITS, z,
+
+        x, y, z,
+        x, y+N_UNITS, z+N_UNITS,
+        x, y, z+N_UNITS,
+
+        x, y, z,
+        x, y+N_UNITS, z,
+        x, y+N_UNITS, z+N_UNITS,
+
+        x, y, z,
+        x+N_UNITS, y, z+N_UNITS,
+        x+N_UNITS, y, z,
+
+        x, y, z,
+        x, y, z+N_UNITS,
+        x+N_UNITS, y, z+N_UNITS,
+
+        x, y, z+N_UNITS,
+        x+N_UNITS, y, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+
+        x, y, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+        x, y+N_UNITS, z+N_UNITS,
+
+        x+N_UNITS, y, z,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+        x+N_UNITS, y, z+N_UNITS,
+
+        x+N_UNITS, y, z,
+        x+N_UNITS, y+N_UNITS, z,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+
+        x, y+N_UNITS, z,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z,
+
+        x, y+N_UNITS, z,
+        x, y+N_UNITS, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+    };
+    // I might be hating C++
+    for(int i = 0; i < 36*3; i++) {
+        cube_coords[i] = temp[i];
+    }
+}
 
 void gridInitShadersGL(void)
 {
@@ -82,7 +156,8 @@ void cursorInitShadersGL(void)
   shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
 
   cursor_shader_program = csX75::CreateProgramGL(shaderList);
-  cursor_offset_id = glGetUniformLocation(grid_shader_program, "grid_offsets");
+  cursor_position_id = glGetAttribLocation(cursor_shader_program, "vPosition");
+  cursor_color_id = glGetAttribLocation(cursor_shader_program, "vColor");
   cursor_uModelViewProjectMatrix_id = glGetUniformLocation(cursor_shader_program, "uModelViewProjectMatrix");
 }
 
@@ -117,13 +192,18 @@ void cursorInitVertexBufferGL(void)
   //Set it as the current buffer to be used by binding it
   glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
-  glBufferData (GL_ARRAY_BUFFER, 9 * sizeof (float), cursor_points, GL_STATIC_DRAW);
+  glBufferData (GL_ARRAY_BUFFER, 36 * 3 * sizeof (float) + 12 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
+  glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 12 * 3 * sizeof(float), cube_colors);
 
   //Enable the vertex attribute
-  glEnableVertexAttribArray (0);
+  glEnableVertexAttribArray (cursor_position_id);
   //This the layout of our first vertex buffer
   //"0" means define the layout for attribute number 0. "3" means that the variables are vec3 made from every 3 floats 
-  glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer (cursor_position_id, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+  glEnableVertexAttribArray(cursor_color_id);
+  glVertexAttribPointer(cursor_color_id, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(36 * 3 * sizeof(float)));
 }
 
 void renderGL(void)
@@ -152,7 +232,7 @@ void renderGL(void)
   glUseProgram(cursor_shader_program);
   glBindVertexArray(cursor_vao);
   glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
 
   // Finally draw the model
 }
@@ -215,6 +295,7 @@ int main(int argc, char** argv)
 
   //Initialize GL state
   csX75::initGL();
+  cubeAt(0, 0, 0);
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
