@@ -1,9 +1,6 @@
 #ifndef _MAIN_HPP_
 #define _MAIN_HPP_
 
-#define DRAW_MIN (-0.9)
-#define DRAW_MAX (0.9)
-
 #include "gl_framework.hpp"
 #include "shader_util.hpp"
 
@@ -17,6 +14,11 @@
 #define N_CELLS 10
 // each cube is N_UNITS x N_UNITS x N_UNITS
 #define N_UNITS 5
+
+#define VIEW_PADDING (1.75)
+
+#define DRAW_MIN (-(N_CELLS*N_UNITS)/2)
+#define DRAW_MAX ((N_CELLS*N_UNITS)/2)
 
 GLfloat xrot = 0, yrot = 0, zrot = 0, rotamount = 0.1;
 
