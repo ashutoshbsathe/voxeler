@@ -54,6 +54,7 @@ GLuint grid_offset_id, cursor_offset_id;
 glm::mat4 rotation_matrix;
 glm::mat4 view_matrix;
 glm::mat4 ortho_matrix;
+glm::mat4 projection_matrix;
 glm::mat4 modelviewproject_matrix;
 GLuint grid_uModelViewProjectMatrix_id, cursor_uModelViewProjectMatrix_id;
 
@@ -135,9 +136,10 @@ void renderGL(void)
   
   view_matrix = glm::lookAt(glm::vec3(0.0,0.0,-2.0),glm::vec3(0.0,0.0,0.0),glm::vec3(0.0,1.0,0.0));
   
-  ortho_matrix = glm::ortho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
+  // ortho_matrix = glm::ortho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
+  projection_matrix = glm::frustum(-1.0, 1.0, -1.0, 1.0, 0.7, 10.0);
 
-  modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
+  modelviewproject_matrix = projection_matrix * view_matrix * rotation_matrix;
 
   // Drawing the grid first 
   glUseProgram(grid_shader_program);
