@@ -60,19 +60,55 @@ glm::mat4 modelviewproject_matrix;
 GLuint grid_uModelViewProjectMatrix_id, cursor_uModelViewProjectMatrix_id;
 
 float cube_coords[36*3];
-float cube_colors[12*3] = {
+float cube_colors[36*3] = {
     183/255.0, 28/255.0, 28/255.0,
+    183/255.0, 28/255.0, 28/255.0,
+    183/255.0, 28/255.0, 28/255.0,
+
     136/255.0, 14/255.0, 79/255.0,
+    136/255.0, 14/255.0, 79/255.0,
+    136/255.0, 14/255.0, 79/255.0,
+
     179/255.0, 136/255.0, 255/255.0,
+    179/255.0, 136/255.0, 255/255.0,
+    179/255.0, 136/255.0, 255/255.0,
+
     74/255.0, 20/255.0, 140/255.0,
+    74/255.0, 20/255.0, 140/255.0,
+    74/255.0, 20/255.0, 140/255.0,
+
     140/255.0, 158/255.0, 255/255.0,
+    140/255.0, 158/255.0, 255/255.0,
+    140/255.0, 158/255.0, 255/255.0,
+
     83/255.0, 109/255.0, 254/255.0,
+    83/255.0, 109/255.0, 254/255.0,
+    83/255.0, 109/255.0, 254/255.0,
+
     100/255.0, 255/255.0, 218/255.0,
+    100/255.0, 255/255.0, 218/255.0,
+    100/255.0, 255/255.0, 218/255.0,
+
     29/255.0, 233/255.0, 182/255.0,
+    29/255.0, 233/255.0, 182/255.0,
+    29/255.0, 233/255.0, 182/255.0,
+
     238/255.0, 255/255.0, 65/255.0,
+    238/255.0, 255/255.0, 65/255.0,
+    238/255.0, 255/255.0, 65/255.0,
+
     198/255.0, 255/255.0, 0/255.0,
+    198/255.0, 255/255.0, 0/255.0,
+    198/255.0, 255/255.0, 0/255.0,
+
     158/255.0, 158/255.0, 158/255.0,
+    158/255.0, 158/255.0, 158/255.0,
+    158/255.0, 158/255.0, 158/255.0,
+
     238/255.0, 238/255.0, 238/255.0,
+    238/255.0, 238/255.0, 238/255.0,
+    238/255.0, 238/255.0, 238/255.0,
+
 };
 void cubeAt(float x, float y, float z) {
     // 6 faces, 12 triangles, 36 vertices, 36 * 3 coords
@@ -192,9 +228,9 @@ void cursorInitVertexBufferGL(void)
   //Set it as the current buffer to be used by binding it
   glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
-  glBufferData (GL_ARRAY_BUFFER, 36 * 3 * sizeof (float) + 12 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
+  glBufferData (GL_ARRAY_BUFFER, 36 * 3 * sizeof (float) + 36 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
   glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
-  glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 12 * 3 * sizeof(float), cube_colors);
+  glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 36 * 3 * sizeof(float), cube_colors);
 
   //Enable the vertex attribute
   glEnableVertexAttribArray (cursor_position_id);
