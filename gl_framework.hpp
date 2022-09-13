@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-
 // From Tutorial_02
 // Define a helpful macro for handling offsets into buffer objects
 #define BUFFER_OFFSET( offset )   ((GLvoid*) (offset))

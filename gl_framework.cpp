@@ -1,5 +1,5 @@
 #include "gl_framework.hpp"
-extern GLfloat xrot, yrot, zrot, rotamount;
+extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 namespace csX75
 {
   //! Initialize GL State
@@ -53,6 +53,36 @@ namespace csX75
     }
     else if(key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS) {
         zrot += rotamount;
+    }
+    else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
+        if(cursor_x < cursor_max - moveamount) {
+            cursor_x += moveamount;
+        }
+    }
+    else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
+        if(cursor_x > cursor_min) {
+            cursor_x -= moveamount;
+        }
+    }
+    else if(key == GLFW_KEY_D && action == GLFW_PRESS) {
+        if(cursor_y < cursor_max - moveamount) {
+            cursor_y += moveamount;
+        }
+    }
+    else if(key == GLFW_KEY_A && action == GLFW_PRESS) {
+        if(cursor_y > cursor_min) {
+            cursor_y -= moveamount;
+        }
+    }
+    else if(key == GLFW_KEY_E && action == GLFW_PRESS) {
+        if(cursor_z < cursor_max - moveamount) {
+            cursor_z += moveamount;
+        }
+    }
+    else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
+        if(cursor_z > cursor_min) {
+            cursor_z -= moveamount;
+        }
     }
   }
 };  

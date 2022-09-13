@@ -50,7 +50,7 @@ void defineGrid() {
 GLuint grid_shader_program, cursor_shader_program;
 GLuint grid_vbo, grid_vao, cursor_vbo, cursor_vao;
 
-GLuint grid_offset_id, cursor_position_id, cursor_color_id;
+GLuint grid_offset_id, cursor_position_id, cursor_offset_id, cursor_color_id;
 
 glm::mat4 rotation_matrix;
 glm::mat4 view_matrix;
@@ -194,6 +194,7 @@ void cursorInitShadersGL(void)
   cursor_shader_program = csX75::CreateProgramGL(shaderList);
   cursor_position_id = glGetAttribLocation(cursor_shader_program, "vPosition");
   cursor_color_id = glGetAttribLocation(cursor_shader_program, "vColor");
+  cursor_offset_id = glGetUniformLocation(cursor_shader_program, "cursor_offset");
   cursor_uModelViewProjectMatrix_id = glGetUniformLocation(cursor_shader_program, "uModelViewProjectMatrix");
 }
 
@@ -271,6 +272,7 @@ void renderGL(void)
   // Draw the cursor cube
   glUseProgram(cursor_shader_program);
   glBindVertexArray(cursor_vao);
+  glUniform3f(cursor_offset_id, cursor_x, cursor_y, cursor_z);
   glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glDrawArrays(GL_TRIANGLES, 0, 36);
 
