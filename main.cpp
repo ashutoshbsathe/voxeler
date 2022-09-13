@@ -115,52 +115,52 @@ void cubeAt(float x, float y, float z) {
     // cube's left bottom back is at (x, y, z)
     float temp[36*3] = {
         x, y, z,
+        x+N_UNITS, y+N_UNITS, z,
         x+N_UNITS, y, z,
-        x+N_UNITS, y+N_UNITS, z,
-
-        x, y, z,
-        x+N_UNITS, y+N_UNITS, z,
-        x, y+N_UNITS, z,
-
-        x, y, z,
-        x, y+N_UNITS, z+N_UNITS,
-        x, y, z+N_UNITS,
 
         x, y, z,
         x, y+N_UNITS, z,
-        x, y+N_UNITS, z+N_UNITS,
-
-        x, y, z,
-        x+N_UNITS, y, z+N_UNITS,
-        x+N_UNITS, y, z,
-
-        x, y, z,
-        x, y, z+N_UNITS,
-        x+N_UNITS, y, z+N_UNITS,
-
-        x, y, z+N_UNITS,
-        x+N_UNITS, y, z+N_UNITS,
-        x+N_UNITS, y+N_UNITS, z+N_UNITS,
-
-        x, y, z+N_UNITS,
-        x+N_UNITS, y+N_UNITS, z+N_UNITS,
-        x, y+N_UNITS, z+N_UNITS,
-
-        x+N_UNITS, y, z,
-        x+N_UNITS, y+N_UNITS, z+N_UNITS,
-        x+N_UNITS, y, z+N_UNITS,
-
-        x+N_UNITS, y, z,
         x+N_UNITS, y+N_UNITS, z,
+
+        x, y, z,
+        x, y, z+N_UNITS,
+        x, y+N_UNITS, z+N_UNITS,
+
+        x, y, z,
+        x, y+N_UNITS, z+N_UNITS,
+        x, y+N_UNITS, z,
+
+        x, y, z,
+        x+N_UNITS, y, z,
+        x+N_UNITS, y, z+N_UNITS,
+
+        x, y, z,
+        x+N_UNITS, y, z+N_UNITS,
+        x, y, z+N_UNITS,
+
+        x, y, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+        x+N_UNITS, y, z+N_UNITS,
+
+        x, y, z+N_UNITS,
+        x, y+N_UNITS, z+N_UNITS,
         x+N_UNITS, y+N_UNITS, z+N_UNITS,
 
-        x, y+N_UNITS, z,
+        x+N_UNITS, y, z,
+        x+N_UNITS, y, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+
+        x+N_UNITS, y, z,
         x+N_UNITS, y+N_UNITS, z+N_UNITS,
         x+N_UNITS, y+N_UNITS, z,
 
         x, y+N_UNITS, z,
-        x, y+N_UNITS, z+N_UNITS,
+        x+N_UNITS, y+N_UNITS, z,
         x+N_UNITS, y+N_UNITS, z+N_UNITS,
+
+        x, y+N_UNITS, z,
+        x+N_UNITS, y+N_UNITS, z+N_UNITS,
+        x, y+N_UNITS, z+N_UNITS,
     };
     // I might be hating C++
     for(int i = 0; i < 36*3; i++) {
@@ -252,10 +252,14 @@ void renderGL(void)
   
   view_matrix = glm::lookAt(glm::vec3(0.0,0.0,VIEW_PADDING*DRAW_MIN),glm::vec3(0.0,0.0,0.0),glm::vec3(0.0,1.0,0.0));
   
-  // ortho_matrix = glm::ortho(-2.0, 2.0, -2.0, 2.0, -20.0, 20.0);
-  projection_matrix = glm::frustum(VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX);
+  ortho_matrix = glm::ortho(
+        VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, 
+        VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, 
+        10 * VIEW_PADDING * DRAW_MIN, 10 * VIEW_PADDING * DRAW_MAX
+  );
+  // projection_matrix = glm::frustum(VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX);
 
-  modelviewproject_matrix = projection_matrix * view_matrix * rotation_matrix;
+  modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
 
   // Drawing the grid first 
   glUseProgram(grid_shader_program);
