@@ -85,10 +85,15 @@ bool compare_vec3(glm::vec3 v1, glm::vec3 v2) {
         return v1.x < v1.x;
     }
 }
+bool equal_vec3(glm::vec3 v1, glm::vec3 v2) {
+    return (v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z);
+}
 bool (*compare_vec3_ptr)(glm::vec3, glm::vec3) = compare_vec3;
 std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
-std::vector<std::vector<glm::vec3>> model_triangle_list;
-std::vector<glm::vec3> model_triangle_colors;
+// TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
+// Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
+std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
+std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
 
 float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
@@ -291,6 +296,40 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
     }
 
     return std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>>(drawList, deleteList);
+}
+
+void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector<std::vector<glm::vec3>> to_remove) {
+    // convert `to_remove` to a set so that searching that becomes logarithmic, will need to define 
+    // a total ordering over triangles 
+    // TODO: Make sure opposite face triangles are in same order and define a triangle compare function
+    // Then mentain 2 indices (i) and (j) such that initially i = j = 0
+    // For every outermost element i.e. a triangle (3 vertices = 9 floats) in the `model_triangle_list`,
+    // if i'th triangle belongs to the set `to_remove` (possible via our custom function), increment j+1 
+    // do `model_triangle_list[i] = model_triangle_list[j]` (move all 9 floats correctly)
+    // This works since it skips over those which we want to remove. TODO: verify on pen paper 
+}
+
+void insertAt(float x, float y, float z) {
+    auto triangles = trianglesAt(glm::vec3(x, y, z));
+    auto to_add = triangles.first, to_remove = triangles.second;
+    updateTrianglesList(to_add, to_remove);
+    model[glm::vec3(x, y, z)] = glm::vec3(cursor_red, cursor_green, cursor_blue);
+}
+
+void deleteAt(float x, float y, float z) {
+    auto triangles = trianglesAt(glm::vec3(x, y, z));
+    // TODO: verify that this is indeed the case for all cubes
+    auto to_add = triangles.second, to_remove = triangles.first;
+    updateTrianglesList(to_add, to_remove);
+    model.erase(glm::vec3(x, y, z));
+}
+
+void insertAtCursor() {
+    insertAt(cursor_x, cursor_y, cursor_z);
+}
+
+void deleteAtCursor() {
+    deleteAt(cursor_x, cursor_y, cursor_z);
 }
 
 void gridInitShadersGL(void)
