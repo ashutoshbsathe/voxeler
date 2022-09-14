@@ -18,53 +18,53 @@ float cursor_points[] {
 };
 float cube_coords[36*3];
 float cube_colors[36*3] = {
-    183/255.0, 28/255.0, 28/255.0,
-    183/255.0, 28/255.0, 28/255.0,
-    183/255.0, 28/255.0, 28/255.0,
+    0/255.0, 255/255.0, 0/255.0,
+    0/255.0, 255/255.0, 0/255.0,
+    0/255.0, 255/255.0, 0/255.0,
 
-    136/255.0, 14/255.0, 79/255.0,
-    136/255.0, 14/255.0, 79/255.0,
-    136/255.0, 14/255.0, 79/255.0,
+    0/255.0, 255/255.0, 0/255.0,
+    0/255.0, 255/255.0, 0/255.0,
+    0/255.0, 255/255.0, 0/255.0,
 
-    179/255.0, 136/255.0, 255/255.0,
-    179/255.0, 136/255.0, 255/255.0,
-    179/255.0, 136/255.0, 255/255.0,
+    0/255.0, 0/255.0, 255/255.0,
+    0/255.0, 0/255.0, 255/255.0,
+    0/255.0, 0/255.0, 255/255.0,
 
-    74/255.0, 20/255.0, 140/255.0,
-    74/255.0, 20/255.0, 140/255.0,
-    74/255.0, 20/255.0, 140/255.0,
+    0/255.0, 0/255.0, 255/255.0,
+    0/255.0, 0/255.0, 255/255.0,
+    0/255.0, 0/255.0, 255/255.0,
 
-    140/255.0, 158/255.0, 255/255.0,
-    140/255.0, 158/255.0, 255/255.0,
-    140/255.0, 158/255.0, 255/255.0,
+    255/255.0, 255/255.0, 0/255.0,
+    255/255.0, 255/255.0, 0/255.0,
+    255/255.0, 255/255.0, 0/255.0,
 
-    83/255.0, 109/255.0, 254/255.0,
-    83/255.0, 109/255.0, 254/255.0,
-    83/255.0, 109/255.0, 254/255.0,
+    255/255.0, 255/255.0, 0/255.0,
+    255/255.0, 255/255.0, 0/255.0,
+    255/255.0, 255/255.0, 0/255.0,
 
-    100/255.0, 255/255.0, 218/255.0,
-    100/255.0, 255/255.0, 218/255.0,
-    100/255.0, 255/255.0, 218/255.0,
+    255/255.0, 255/255.0, 255/255.0,
+    255/255.0, 255/255.0, 255/255.0,
+    255/255.0, 255/255.0, 255/255.0,
 
-    29/255.0, 233/255.0, 182/255.0,
-    29/255.0, 233/255.0, 182/255.0,
-    29/255.0, 233/255.0, 182/255.0,
+    255/255.0, 255/255.0, 255/255.0,
+    255/255.0, 255/255.0, 255/255.0,
+    255/255.0, 255/255.0, 255/255.0,
 
-    238/255.0, 255/255.0, 65/255.0,
-    238/255.0, 255/255.0, 65/255.0,
-    238/255.0, 255/255.0, 65/255.0,
+    255/255.0, 0/255.0, 0/255.0,
+    255/255.0, 0/255.0, 0/255.0,
+    255/255.0, 0/255.0, 0/255.0,
 
-    198/255.0, 255/255.0, 0/255.0,
-    198/255.0, 255/255.0, 0/255.0,
-    198/255.0, 255/255.0, 0/255.0,
+    255/255.0, 0/255.0, 0/255.0,
+    255/255.0, 0/255.0, 0/255.0,
+    255/255.0, 0/255.0, 0/255.0,
 
-    158/255.0, 158/255.0, 158/255.0,
-    158/255.0, 158/255.0, 158/255.0,
-    158/255.0, 158/255.0, 158/255.0,
+    255/255.0, 0/255.0, 255/255.0,
+    255/255.0, 0/255.0, 255/255.0,
+    255/255.0, 0/255.0, 255/255.0,
 
-    238/255.0, 238/255.0, 238/255.0,
-    238/255.0, 238/255.0, 238/255.0,
-    238/255.0, 238/255.0, 238/255.0,
+    255/255.0, 0/255.0, 255/255.0,
+    255/255.0, 0/255.0, 255/255.0,
+    255/255.0, 0/255.0, 255/255.0,
 };
 bool compare_vec3(glm::vec3 v1, glm::vec3 v2) {
     if(v1.x == v2.x) {
@@ -84,7 +84,7 @@ std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3
 std::vector<std::vector<glm::vec3>> model_triangle_list;
 std::vector<glm::vec3> model_triangle_colors;
 
-std::vector<std::vector<glm::vec3>> cube_triangle_list;
+float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
 
 GLuint grid_shader_program, cursor_shader_program, model_shader_program;
@@ -188,7 +188,7 @@ void cubeAt(float x, float y, float z) {
     }
 }
 
-std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>> trianglesAt(glm::vec3 pos_c) {
+std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>> trianglesAt(glm::vec3 c) {
     /* Ref for cube ascii : https://codegolf.stackexchange.com/q/189
      *         (+Y)
      *         |
@@ -210,78 +210,97 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
      *  Else, triangles corr to that face will be added to (drawList)
      * Returns the pair (drawList, deleteList)
      */
-    glm::vec3 pos_a, pos_b, pos_d, pos_e, pos_f, pos_g, pos_h;
+    glm::vec3 a, b, d, e, f, g, h;
+
+    a = c + glm::vec3(N_UNITS, 0, N_UNITS);
+    b = c + glm::vec3(N_UNITS, 0, 0);
+    d = c + glm::vec3(0, 0, N_UNITS);
+
+    e = c + glm::vec3(N_UNITS, N_UNITS, N_UNITS);
+    f = c + glm::vec3(N_UNITS, N_UNITS, 0);
+    g = c + glm::vec3(0, N_UNITS, 0);
+    h = c + glm::vec3(0, N_UNITS, N_UNITS);
+    
+    /*
+    std::vector<std::vector<glm::vec3>> drawList{
+{b,a,e},
+{b,e,f},
+{c,a,d},
+{c,b,a},
+{c,d,h},
+{c,f,b},
+{c,g,f},
+{c,h,g},
+{d,e,a},
+{d,h,e},
+{g,e,h},
+{g,f,e},
+    }, deleteList;
+    */
     std::vector<std::vector<glm::vec3>> drawList, deleteList;
-    pos_a = pos_c + glm::vec3(N_UNITS, 0, N_UNITS);
-    pos_b = pos_c + glm::vec3(N_UNITS, 0, 0);
-    pos_d = pos_c + glm::vec3(0, 0, N_UNITS);
 
-    pos_e = pos_c + glm::vec3(N_UNITS, N_UNITS, N_UNITS);
-    pos_f = pos_c + glm::vec3(N_UNITS, N_UNITS, 0);
-    pos_e = pos_c + glm::vec3(0, N_UNITS, 0);
-    pos_h = pos_c + glm::vec3(0, N_UNITS, N_UNITS);
-
-    std::vector<glm::vec3> tri_acb{pos_a, pos_c, pos_b}, tri_adc{pos_a, pos_d, pos_c};
-    std::vector<glm::vec3> tri_bfe{pos_b, pos_f, pos_e}, tri_abe{pos_a, pos_b, pos_e};
-    std::vector<glm::vec3> tri_fgh{pos_f, pos_g, pos_h}, tri_hef{pos_h, pos_e, pos_f};
-    std::vector<glm::vec3> tri_dhc{pos_d, pos_h, pos_c}, tri_hgc{pos_h, pos_g, pos_c};
-    std::vector<glm::vec3> tri_dah{pos_d, pos_a, pos_h}, tri_aeh{pos_a, pos_e, pos_h};
-    std::vector<glm::vec3> tri_cgb{pos_c, pos_g, pos_b}, tri_bgf{pos_b, pos_g, pos_f};
-
+    std::vector<glm::vec3> left_1{c, h, g}, left_2{c, d, h};
+    std::vector<glm::vec3> right_1{b, a, e}, right_2{b, e, f};
+    std::vector<glm::vec3> bottom_1{c, a, d}, bottom_2{c, b, a};
+    std::vector<glm::vec3> top_1{g, e, h}, top_2{g, f, e};
+    std::vector<glm::vec3> front_1{d, e, a}, front_2{d, h, e};
+    std::vector<glm::vec3> back_1{c, b, f}, back_2{c, f, g};
+    
     // Bottom face
-    if(model.find(pos_c + glm::vec3(0, -N_UNITS, 0)) != model.end()) {
-        deleteList.push_back(tri_acb);
-        deleteList.push_back(tri_adc);
+    if(model.find(c + glm::vec3(0, -N_UNITS, 0)) != model.end()) {
+        deleteList.push_back(back_1);
+        deleteList.push_back(back_2);
     }
     else {
-        drawList.push_back(tri_acb);
-        drawList.push_back(tri_adc);
-    }
-    // Right face
-    if(model.find(pos_c + glm::vec3(N_UNITS, 0, 0)) != model.end()) {
-        deleteList.push_back(tri_bfe);
-        deleteList.push_back(tri_abe);
-    }
-    else {
-        drawList.push_back(tri_bfe);
-        drawList.push_back(tri_abe);
+        drawList.push_back(back_1);
+        drawList.push_back(back_2);
     }
     // Top face
-    if(model.find(pos_c + glm::vec3(0, N_UNITS, 0)) != model.end()) {
-        deleteList.push_back(tri_fgh);
-        deleteList.push_back(tri_hef);
+    if(model.find(c + glm::vec3(0, N_UNITS, 0)) != model.end()) {
+        deleteList.push_back(top_1);
+        deleteList.push_back(top_2);
     }
     else {
-        drawList.push_back(tri_fgh);
-        drawList.push_back(tri_hef);
+        drawList.push_back(top_1);
+        drawList.push_back(top_2);
+    }
+    // Right face
+    if(model.find(c + glm::vec3(N_UNITS, 0, 0)) != model.end()) {
+        deleteList.push_back(right_1);
+        deleteList.push_back(right_2);
+    }
+    else {
+        drawList.push_back(right_1);
+        drawList.push_back(right_2);
     }
     // Left face
-    if(model.find(pos_c + glm::vec3(-N_UNITS, 0, 0)) != model.end()) {
-        deleteList.push_back(tri_dhc);
-        deleteList.push_back(tri_hgc);
+    if(model.find(c + glm::vec3(-N_UNITS, 0, 0)) != model.end()) {
+        deleteList.push_back(left_1);
+        deleteList.push_back(left_2);
     }
     else {
-        drawList.push_back(tri_dhc);
-        drawList.push_back(tri_hgc);
+        drawList.push_back(left_1);
+        drawList.push_back(left_2);
     }
     // Front face
-    if(model.find(pos_c + glm::vec3(0, 0, N_UNITS)) != model.end()) {
-        deleteList.push_back(tri_dah);
-        deleteList.push_back(tri_aeh);
+    if(model.find(c + glm::vec3(0, 0, N_UNITS)) != model.end()) {
+        deleteList.push_back(front_1);
+        deleteList.push_back(front_2);
     }
     else {
-        drawList.push_back(tri_dah);
-        drawList.push_back(tri_aeh);
+        drawList.push_back(front_1);
+        drawList.push_back(front_2);
     }
     // Back face
-    if(model.find(pos_c + glm::vec3(0, 0, -N_UNITS)) != model.end()) {
-        deleteList.push_back(tri_cgb);
-        deleteList.push_back(tri_bgf);
+    if(model.find(c + glm::vec3(0, 0, -N_UNITS)) != model.end()) {
+        deleteList.push_back(back_1);
+        deleteList.push_back(back_2);
     }
     else {
-        drawList.push_back(tri_cgb);
-        drawList.push_back(tri_bgf);
+        drawList.push_back(back_1);
+        drawList.push_back(back_2);
     }
+
 
     return std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>>(drawList, deleteList);
 }
@@ -349,7 +368,7 @@ void cursorInitVertexBufferGL(void)
   //Copy the points into the current buffer - 9 float values, start pointer and static data
   glBufferData (GL_ARRAY_BUFFER, 36 * 3 * sizeof (float) + 36 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
   //glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_triangle_list[0].data());
+  glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_triangle_list);
   glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 36 * 3 * sizeof(float), cube_colors);
 
   //Enable the vertex attribute
@@ -462,12 +481,28 @@ int main(int argc, char** argv)
   model_triangle_list.clear();
   model_triangle_colors.clear();
 
-  cube_triangle_list.clear();
+  //cube_triangle_list.clear();
   cube_triangle_colors.clear();
   
   // since model is empty it should return all triangles
-  cube_triangle_list = trianglesAt(glm::vec3(0, 0, 0)).first;
-  //cubeAt(0, 0, 0);
+  auto tmp = trianglesAt(glm::vec3(0, 0, 0)).first;
+  for(int i = 0; i < tmp.size(); i++) {
+      for(int j = 0; j < 3; j++) {
+            cube_triangle_list[i][j][0] = tmp[i][j].x;
+            cube_triangle_list[i][j][1] = tmp[i][j].y;
+            cube_triangle_list[i][j][2] = tmp[i][j].z;
+      }
+  }
+  std::cout << "------------------------\n";
+  cubeAt(0, 0, 0);
+  // 12 triangles
+  for(int i = 0; i < 12; i++) {
+      // each triangle has 3 points
+      for(int j = 0; j < 3; j++) {
+        std::cout << "(" << cube_coords[i*9+j*3] << ", " << cube_coords[i*9+j*3+1] << ", " << cube_coords[i*9+j*3+2] << ")\n";
+      }
+      std::cout << "\n";
+  }
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
