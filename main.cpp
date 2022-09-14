@@ -18,6 +18,7 @@ float cursor_points[] {
 };
 float cube_coords[36*3];
 float cube_colors[36*3] = {
+    // green
     0/255.0, 255/255.0, 0/255.0,
     0/255.0, 255/255.0, 0/255.0,
     0/255.0, 255/255.0, 0/255.0,
@@ -26,6 +27,7 @@ float cube_colors[36*3] = {
     0/255.0, 255/255.0, 0/255.0,
     0/255.0, 255/255.0, 0/255.0,
 
+    // blue
     0/255.0, 0/255.0, 255/255.0,
     0/255.0, 0/255.0, 255/255.0,
     0/255.0, 0/255.0, 255/255.0,
@@ -34,6 +36,7 @@ float cube_colors[36*3] = {
     0/255.0, 0/255.0, 255/255.0,
     0/255.0, 0/255.0, 255/255.0,
 
+    // yellow
     255/255.0, 255/255.0, 0/255.0,
     255/255.0, 255/255.0, 0/255.0,
     255/255.0, 255/255.0, 0/255.0,
@@ -42,6 +45,7 @@ float cube_colors[36*3] = {
     255/255.0, 255/255.0, 0/255.0,
     255/255.0, 255/255.0, 0/255.0,
 
+    // white
     255/255.0, 255/255.0, 255/255.0,
     255/255.0, 255/255.0, 255/255.0,
     255/255.0, 255/255.0, 255/255.0,
@@ -50,6 +54,7 @@ float cube_colors[36*3] = {
     255/255.0, 255/255.0, 255/255.0,
     255/255.0, 255/255.0, 255/255.0,
 
+    // red
     255/255.0, 0/255.0, 0/255.0,
     255/255.0, 0/255.0, 0/255.0,
     255/255.0, 0/255.0, 0/255.0,
@@ -58,6 +63,7 @@ float cube_colors[36*3] = {
     255/255.0, 0/255.0, 0/255.0,
     255/255.0, 0/255.0, 0/255.0,
 
+    // magenta
     255/255.0, 0/255.0, 255/255.0,
     255/255.0, 0/255.0, 255/255.0,
     255/255.0, 0/255.0, 255/255.0,
@@ -248,12 +254,12 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
     
     // Bottom face
     if(model.find(c + glm::vec3(0, -N_UNITS, 0)) != model.end()) {
-        deleteList.push_back(back_1);
-        deleteList.push_back(back_2);
+        deleteList.push_back(bottom_1);
+        deleteList.push_back(bottom_2);
     }
     else {
-        drawList.push_back(back_1);
-        drawList.push_back(back_2);
+        drawList.push_back(bottom_1);
+        drawList.push_back(bottom_2);
     }
     // Top face
     if(model.find(c + glm::vec3(0, N_UNITS, 0)) != model.end()) {
@@ -488,12 +494,28 @@ int main(int argc, char** argv)
   auto tmp = trianglesAt(glm::vec3(0, 0, 0)).first;
   for(int i = 0; i < tmp.size(); i++) {
       for(int j = 0; j < 3; j++) {
-            cube_triangle_list[i][j][0] = tmp[i][j].x;
-            cube_triangle_list[i][j][1] = tmp[i][j].y;
-            cube_triangle_list[i][j][2] = tmp[i][j].z;
+          cube_triangle_list[i][j][0] = tmp[i][j].x;
+          cube_triangle_list[i][j][1] = tmp[i][j].y;
+          cube_triangle_list[i][j][2] = tmp[i][j].z;
+          std::cout << "(" << tmp[i][j].x << ", " << tmp[i][j].y << ", " << tmp[i][j].z << ")\n";
       }
+      std::cout << "i = " << i << " ended\n";
+  }
+  for(int i = 0; i < 12; i++) {
+      std::cout << "Triangle #" << i+1 << ": [ ";
+      for(int j = 0; j < 3; j++) {
+          std::cout << "(";
+          std::cout << *((float *)cube_triangle_list + i * 9 + j * 3);
+          std::cout << ", ";
+          std::cout << *((float *)cube_triangle_list + i * 9 + j * 3 + 1);
+          std::cout << ", ";
+          std::cout << *((float *)cube_triangle_list + i * 9 + j * 3 + 2);
+          std::cout << ") ";
+      }
+      std::cout << "]\n";
   }
   std::cout << "------------------------\n";
+  /*
   cubeAt(0, 0, 0);
   // 12 triangles
   for(int i = 0; i < 12; i++) {
@@ -503,6 +525,7 @@ int main(int argc, char** argv)
       }
       std::cout << "\n";
   }
+  */
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
