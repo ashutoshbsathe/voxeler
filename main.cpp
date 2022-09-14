@@ -66,8 +66,26 @@ float cube_colors[36*3] = {
     238/255.0, 238/255.0, 238/255.0,
     238/255.0, 238/255.0, 238/255.0,
 };
-std::map<glm::vec3, glm::vec3> model;
-std::vector<std::vector<glm::vec3>> triangle_list;
+bool compare_vec3(glm::vec3 v1, glm::vec3 v2) {
+    if(v1.x == v2.x) {
+        if(v1.y == v2.y) {
+            return v1.z < v2.z;
+        }
+        else {
+            return v1.y < v2.y;
+        }
+    }
+    else {
+        return v1.x < v1.x;
+    }
+}
+bool (*compare_vec3_ptr)(glm::vec3, glm::vec3) = compare_vec3;
+std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
+std::vector<std::vector<glm::vec3>> model_triangle_list;
+std::vector<glm::vec3> model_triangle_colors;
+
+std::vector<std::vector<glm::vec3>> cube_triangle_list;
+std::vector<glm::vec3> cube_triangle_colors;
 
 GLuint grid_shader_program, cursor_shader_program, model_shader_program;
 GLuint grid_vbo, grid_vao, cursor_vbo, cursor_vao, model_vbo, model_vao;
@@ -330,7 +348,8 @@ void cursorInitVertexBufferGL(void)
   glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
   //Copy the points into the current buffer - 9 float values, start pointer and static data
   glBufferData (GL_ARRAY_BUFFER, 36 * 3 * sizeof (float) + 36 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_triangle_list[0].data());
   glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 36 * 3 * sizeof(float), cube_colors);
 
   //Enable the vertex attribute
@@ -437,7 +456,18 @@ int main(int argc, char** argv)
 
   //Initialize GL state
   csX75::initGL();
-  cubeAt(0, 0, 0);
+
+  model.clear();
+
+  model_triangle_list.clear();
+  model_triangle_colors.clear();
+
+  cube_triangle_list.clear();
+  cube_triangle_colors.clear();
+  
+  // since model is empty it should return all triangles
+  cube_triangle_list = trianglesAt(glm::vec3(0, 0, 0)).first;
+  //cubeAt(0, 0, 0);
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
