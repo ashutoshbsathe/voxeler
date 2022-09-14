@@ -217,6 +217,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
      * Returns the pair (drawList, deleteList)
      */
     glm::vec3 a, b, d, e, f, g, h;
+    std::vector<std::vector<glm::vec3>> drawList, deleteList;
 
     a = c + glm::vec3(N_UNITS, 0, N_UNITS);
     b = c + glm::vec3(N_UNITS, 0, 0);
@@ -227,24 +228,6 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
     g = c + glm::vec3(0, N_UNITS, 0);
     h = c + glm::vec3(0, N_UNITS, N_UNITS);
     
-    /*
-    std::vector<std::vector<glm::vec3>> drawList{
-{b,a,e},
-{b,e,f},
-{c,a,d},
-{c,b,a},
-{c,d,h},
-{c,f,b},
-{c,g,f},
-{c,h,g},
-{d,e,a},
-{d,h,e},
-{g,e,h},
-{g,f,e},
-    }, deleteList;
-    */
-    std::vector<std::vector<glm::vec3>> drawList, deleteList;
-
     std::vector<glm::vec3> left_1{c, h, g}, left_2{c, d, h};
     std::vector<glm::vec3> right_1{b, a, e}, right_2{b, e, f};
     std::vector<glm::vec3> bottom_1{c, a, d}, bottom_2{c, b, a};
@@ -306,7 +289,6 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(back_1);
         drawList.push_back(back_2);
     }
-
 
     return std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>>(drawList, deleteList);
 }
