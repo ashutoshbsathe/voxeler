@@ -33,3 +33,7 @@ More ref: https://learnopengl.com/Advanced-OpenGL/Instancing
 # Figuring out triangles to draw for the whole model 
 
 * https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
+
+# Timing various approaches (optional)
+
+* https://www.khronos.org/opengl/wiki/Query_Object#Timer_queries
