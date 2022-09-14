@@ -1,6 +1,8 @@
 #ifndef _MAIN_HPP_
 #define _MAIN_HPP_
 
+#include <bits/stdc++.h>
+
 #include "gl_framework.hpp"
 #include "shader_util.hpp"
 
