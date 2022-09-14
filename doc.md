@@ -29,3 +29,7 @@ More ref: https://learnopengl.com/Advanced-OpenGL/Instancing
 # Cube
 * https://www.khronos.org/opengl/wiki/Primitive (GL_PATCHES)
 * https://www.khronos.org/opengl/wiki/Tessellation#Patches
+
+# Figuring out triangles to draw for the whole model 
+
+* https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/
