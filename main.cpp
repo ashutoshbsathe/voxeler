@@ -402,11 +402,17 @@ void renderGL(void)
         VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, 
         10 * VIEW_PADDING * DRAW_MIN, 10 * VIEW_PADDING * DRAW_MAX
   );
-  // projection_matrix = glm::frustum(VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX);
+  // projection_matrix = glm::frustum(VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, VIEW_PADDING * DRAW_MIN, VIEW_PADDING * DRAW_MAX, 10 * VIEW_PADDING * DRAW_MIN, 10 * VIEW_PADDING * DRAW_MAX);
+  projection_matrix = glm::frustum(-1,1,-1,1,1,10);
 
-  modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
+  if(persp){
+	modelviewproject_matrix = projection_matrix * view_matrix * rotation_matrix;
+  }
+  else 
+	modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
 
-  // Drawing the grid first 
+  // Drawing the grid first
+  
   glUseProgram(grid_shader_program);
   glBindVertexArray(grid_vao);
   glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);

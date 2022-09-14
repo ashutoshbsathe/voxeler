@@ -1,5 +1,6 @@
 #include "gl_framework.hpp"
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
+extern bool persp;
 namespace csX75
 {
   //! Initialize GL State
@@ -83,6 +84,12 @@ namespace csX75
         if(cursor_z > cursor_min) {
             cursor_z -= moveamount;
         }
+    }
+    else if(key == GLFW_KEY_P && action == GLFW_PRESS) {
+		if(persp)
+			persp = false;
+		else
+			persp = true;
     }
   }
 };  

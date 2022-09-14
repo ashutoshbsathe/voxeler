@@ -24,4 +24,5 @@
 
 GLfloat xrot = 0, yrot = 0, zrot = 0, rotamount = 0.1;
 GLfloat cursor_x = 0, cursor_y = 0, cursor_z = 0, moveamount = N_UNITS, cursor_max = DRAW_MAX, cursor_min = DRAW_MIN;
+bool persp = false;
 #endif
