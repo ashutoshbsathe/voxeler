@@ -1,21 +1,8 @@
 #include "main.hpp"
+#include <vector>
 
-/*
-float points[] = {
-    -0.95f,  0.95f, 0.0f,
-     0.95f,  0.95f, 0.0f,
-     0.95f, -0.95f, 0.0f,
-    -0.95f, -0.95f, 0.0f
-  };
-*/
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
 float grid_offsets[N_CELLS+2];
-float cursor_points[] {
-    -0.95f,  0.95f, 0.0f,
-     0.95f,  0.95f, 0.0f,
-     0.95f, -0.95f, 0.0f,
-    -0.95f, -0.95f, 0.0f
-};
 float cube_coords[36*3];
 float cube_colors[36*3] = {
     // green
@@ -92,8 +79,11 @@ bool (*compare_vec3_ptr)(glm::vec3, glm::vec3) = compare_vec3;
 std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
 // TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
 // Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
-std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
-std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
+//std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
+std::vector<glm::vec3> *model_triangle_list= new std::vector<glm::vec3>[12*N_CELLS*N_CELLS]();
+//std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
+std::vector<glm::vec3> *model_triangle_colors = new std::vector<glm::vec3>[12*N_CELLS*N_CELLS]();
+long size_model_triangle_list = 0;
 
 float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
@@ -133,7 +123,6 @@ void defineGrid() {
         points[idx++] = coords[N_CELLS][i][1]; // y coord 
     }
     */
-    std::cout << "Last idx = " << idx << "\n";
     // prepare `grid_offsets` which will be passed as a uniform 
     grid_offsets[0] = N_CELLS;
     for(int i = 1; i <= N_CELLS+1; i++) {
@@ -302,11 +291,27 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
     // convert `to_remove` to a set so that searching that becomes logarithmic, will need to define 
     // a total ordering over triangles 
     // TODO: Make sure opposite face triangles are in same order and define a triangle compare function
-    // Then mentain 2 indices (i) and (j) such that initially i = j = 0
+    // Then mantain 2 indices (i) and (j) such that initially i = j = 0
     // For every outermost element i.e. a triangle (3 vertices = 9 floats) in the `model_triangle_list`,
     // if i'th triangle belongs to the set `to_remove` (possible via our custom function), increment j+1 
     // do `model_triangle_list[i] = model_triangle_list[j]` (move all 9 floats correctly)
-    // This works since it skips over those which we want to remove. TODO: verify on pen paper 
+    // This works since it skips over those which we want to remove. TODO: verify on pen paper
+	
+	long i=0, j=0;
+	// converting the `to_remove` vector to a set
+	std::set<std::vector<glm::vec3>> to_remove_set(to_remove.begin(), to_remove.end());
+	while(j<size_model_triangle_list){
+		model_triangle_list[i] = model_triangle_list[j];
+		//check if model_triangle_list[i] isn't present in to_remove_set
+		if(to_remove_set.find(model_triangle_list[i]) == to_remove_set.end()){
+				i++;
+		}
+		j++;
+	}
+	for(auto & add_triangle: to_add){
+		model_triangle_list[i++] = add_triangle;
+	}
+	size_model_triangle_list = i - 1;
 }
 
 void insertAt(float x, float y, float z) {
@@ -524,10 +529,11 @@ int main(int argc, char** argv)
           cube_triangle_list[i][j][0] = tmp[i][j].x;
           cube_triangle_list[i][j][1] = tmp[i][j].y;
           cube_triangle_list[i][j][2] = tmp[i][j].z;
-          std::cout << "(" << tmp[i][j].x << ", " << tmp[i][j].y << ", " << tmp[i][j].z << ")\n";
+          //std::cout << "(" << tmp[i][j].x << ", " << tmp[i][j].y << ", " << tmp[i][j].z << ")\n";
       }
-      std::cout << "i = " << i << " ended\n";
+      //std::cout << "i = " << i << " ended\n";
   }
+  /*
   for(int i = 0; i < 12; i++) {
       std::cout << "Triangle #" << i+1 << ": [ ";
       for(int j = 0; j < 3; j++) {
@@ -542,7 +548,6 @@ int main(int argc, char** argv)
       std::cout << "]\n";
   }
   std::cout << "------------------------\n";
-  /*
   cubeAt(0, 0, 0);
   // 12 triangles
   for(int i = 0; i < 12; i++) {

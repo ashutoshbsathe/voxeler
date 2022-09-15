@@ -1,0 +1,9 @@
+1. How is this model is defined?
+2. How are we saving/reading a file for storing/retreiving the model. 
+3. updateTrianglesList(to_add, to_remove)
+	* how exactly is going to work?
+	* where will it update the trianglesList? Into which list? -- model_triangle_list
+4. How exactly are we going to maintain this "model_triangle_list"? -- what's the point of allocating an array on heap? -- to retain the information even if we terminate the program.
+5. Need to design a wrapper to use insertAtCursor()/deleteAtCursor() functions while editing a model using the cursor.
+6. Write functions to initialize the vbo and vao for the model.
+7. Meaning of line no. 79 & 80 ??
