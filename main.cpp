@@ -149,7 +149,7 @@ void defineGrid() {
 }
 
 void printTriangleList() {
-    std::cout << "Triangle List: {\n";
+    std::cout << "Triangle List: (Length = " << num_triangles << "): {\n";
     for(unsigned long i = 0; i < num_triangles; i++) {
         std::cout << "\t[ ";
         for(int j = 0; j < 3; j++) {
@@ -161,7 +161,7 @@ void printTriangleList() {
 }
 
 void printModel() {
-    std::cout << "Model : {\n";
+    std::cout << "Model: (Length = " << model.size() << "): {\n";
     for(auto pair : model) {
         std::cout << "\t(" << pair.first.x << ", " << pair.first.y << ", " << pair.first.z << ") -> (" << pair.second.x << ", " << pair.second.y << ", " << pair.second.z << ")\n";
     }
@@ -338,8 +338,8 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
 	unsigned long i=0, j=0;
 	// converting the `to_remove` vector to a set
     std::set<Triangle> to_remove_set(to_remove.begin(), to_remove.end()); // TODO: make unordered set
+    std::cout << "|to_add| = " << to_add.size() << ", |to_remove| = " << to_remove.size() << ", |to_remove_set| = " << to_remove_set.size() << "\n";
     for(j = 0; j < num_triangles; j++) {
-        std::cout << "At tri#"<<j<<"/" << max_num_triangles << ", i = " << i << "\n";
         // is j'th triangle to be removed ?
         Triangle tri_j(
             Point(
@@ -373,7 +373,14 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
             i++;
         }
         else {
-            std::cout << "Skipping j = " << j << "\n";
+            std::cout << "Skipping j = " << j << ": [ ";
+            for(int k = 0; k < 3; k++) {
+                std::cout << "(" << model_triangle_list[j][k][0];
+                std::cout << "," << model_triangle_list[j][k][1];
+                std::cout << "," << model_triangle_list[j][k][2];
+                std::cout << ") ";
+            }
+            std::cout << "]\n";
         }
     }
     for(auto tri_add : to_add) {
@@ -387,7 +394,6 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         model_triangle_list[i][2][1] = tri_add.p3.y;
         model_triangle_list[i][2][2] = tri_add.p3.z;
         i++;
-        std::cout << "Added tri#" << i << "\n";
     }
     num_triangles = i;
 }
