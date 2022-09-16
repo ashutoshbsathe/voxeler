@@ -75,7 +75,24 @@ bool compare_vec3(glm::vec3 v1, glm::vec3 v2) {
 bool equal_vec3(glm::vec3 v1, glm::vec3 v2) {
     return (v1.x == v2.x) && (v1.y == v2.y) && (v1.z == v2.z);
 }
+bool compare_tri(std::vector<glm::vec3> t1, std::vector<glm::vec3> t2) {
+    if(t1.size() != t2.size()) {
+        return t1.size() < t2.size();
+    }
+    if(equal_vec3(t1[0], t2[0])) {
+        if(equal_vec3(t1[1], t2[1])) {
+            return compare_vec3(t1[2], t2[2]);
+        }
+        else {
+            return compare_vec3(t1[1], t2[1]);
+        }
+    }
+    else {
+        return compare_vec3(t1[0], t2[0]);
+    }
+}
 bool (*compare_vec3_ptr)(glm::vec3, glm::vec3) = compare_vec3;
+bool (*compare_tri_ptr)(std::vector<glm::vec3>, std::vector<glm::vec3>) = compare_tri;
 std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
 // TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
 // Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
@@ -299,7 +316,7 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
 	
 	long i=0, j=0;
 	// converting the `to_remove` vector to a set
-	std::set<std::vector<glm::vec3>> to_remove_set(to_remove.begin(), to_remove.end());
+	std::set<std::vector<glm::vec3>, bool(*)(std::vector<glm::vec3>, std::vector<glm::vec3>)> to_remove_set(to_remove.begin(), to_remove.end(), compare_tri_ptr);
 	while(j<size_model_triangle_list){
 		model_triangle_list[i] = model_triangle_list[j];
 		//check if model_triangle_list[i] isn't present in to_remove_set
@@ -516,11 +533,11 @@ int main(int argc, char** argv)
 
   model.clear();
 
-  model_triangle_list.clear();
-  model_triangle_colors.clear();
+  //model_triangle_list.clear();
+  //model_triangle_colors.clear();
 
   //cube_triangle_list.clear();
-  cube_triangle_colors.clear();
+  //cube_triangle_colors.clear();
   
   // since model is empty it should return all triangles
   auto tmp = trianglesAt(glm::vec3(0, 0, 0)).first;
