@@ -97,10 +97,10 @@ std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3
 // TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
 // Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
 //std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
-std::vector<glm::vec3> *model_triangle_list= new std::vector<glm::vec3>[12*N_CELLS*N_CELLS]();
+float ***model_triangle_list;
 //std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
-std::vector<glm::vec3> *model_triangle_colors = new std::vector<glm::vec3>[12*N_CELLS*N_CELLS]();
-long size_model_triangle_list = 0;
+float ***model_triangle_colors;
+unsigned long num_triangles = 0, max_num_triangles = 6 * N_CELLS * N_CELLS * 2;
 
 float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
@@ -145,6 +145,26 @@ void defineGrid() {
     for(int i = 1; i <= N_CELLS+1; i++) {
         grid_offsets[i] = DRAW_MIN + (i-1) * (DRAW_MAX - DRAW_MIN) / N_CELLS;
     }
+}
+
+void printTriangleList() {
+    std::cout << "Triangle List: {\n";
+    for(unsigned long i = 0; i < num_triangles; i++) {
+        std::cout << "\t[ ";
+        for(int j = 0; j < 3; j++) {
+            std::cout << "(" << model_triangle_list[i][j][0] << ", " << model_triangle_list[i][j][1] << ", " << model_triangle_list[i][j][2] << ") ";
+        }
+        std::cout << "]\n";
+    }
+    std::cout << "}\n";
+}
+
+void printModel() {
+    std::cout << "Model : {\n";
+    for(auto pair : model) {
+        std::cout << "\t(" << pair.first.x << ", " << pair.first.y << ", " << pair.first.z << ") -> (" << pair.second.x << ", " << pair.second.y << ", " << pair.second.z << ")\n";
+    }
+    std::cout << "}\n";
 }
 
 void cubeAt(float x, float y, float z) {
@@ -314,21 +334,61 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
     // do `model_triangle_list[i] = model_triangle_list[j]` (move all 9 floats correctly)
     // This works since it skips over those which we want to remove. TODO: verify on pen paper
 	
-	long i=0, j=0;
+	unsigned long i=0, j=0;
 	// converting the `to_remove` vector to a set
 	std::set<std::vector<glm::vec3>, bool(*)(std::vector<glm::vec3>, std::vector<glm::vec3>)> to_remove_set(to_remove.begin(), to_remove.end(), compare_tri_ptr);
-	while(j<size_model_triangle_list){
-		model_triangle_list[i] = model_triangle_list[j];
-		//check if model_triangle_list[i] isn't present in to_remove_set
-		if(to_remove_set.find(model_triangle_list[i]) == to_remove_set.end()){
-				i++;
-		}
-		j++;
-	}
-	for(auto & add_triangle: to_add){
-		model_triangle_list[i++] = add_triangle;
-	}
-	size_model_triangle_list = i - 1;
+    for(j = 0; j < num_triangles; j++) {
+        std::cout << "At tri#"<<j<<"/" << max_num_triangles << ", i = " << i << "\n";
+        // is j'th triangle to be removed ?
+        std::vector<glm::vec3> tri_j = {
+            glm::vec3(
+                model_triangle_list[j][0][0],
+                model_triangle_list[j][0][1],
+                model_triangle_list[j][0][2]
+            ),
+            glm::vec3(
+                model_triangle_list[j][1][0],
+                model_triangle_list[j][1][1],
+                model_triangle_list[j][1][2]
+            ),
+            glm::vec3(
+                model_triangle_list[j][2][0],
+                model_triangle_list[j][2][1],
+                model_triangle_list[j][2][2]
+            )
+        };
+        if(to_remove_set.find(tri_j) == to_remove_set.end()) {
+            // tri_j not to be removed
+            // copy tri_j to tri_i
+            model_triangle_list[i][0][0] = model_triangle_list[j][0][0];
+            model_triangle_list[i][0][1] = model_triangle_list[j][0][1];
+            model_triangle_list[i][0][2] = model_triangle_list[j][0][2];
+            model_triangle_list[i][1][0] = model_triangle_list[j][1][0];
+            model_triangle_list[i][1][1] = model_triangle_list[j][1][1];
+            model_triangle_list[i][1][2] = model_triangle_list[j][1][2];
+            model_triangle_list[i][2][0] = model_triangle_list[j][2][0];
+            model_triangle_list[i][2][1] = model_triangle_list[j][2][1];
+            model_triangle_list[i][2][2] = model_triangle_list[j][2][2];
+            i++;
+        }
+        else {
+            std::cout << "Skipping j = " << j << "\n";
+        }
+    }
+    for(auto tri_add : to_add) {
+        model_triangle_list[i][0][0] = tri_add[0].x;
+        model_triangle_list[i][0][1] = tri_add[0].y;
+        model_triangle_list[i][0][2] = tri_add[0].z;
+        model_triangle_list[i][1][0] = tri_add[1].x;
+        model_triangle_list[i][1][1] = tri_add[1].y;
+        model_triangle_list[i][1][2] = tri_add[1].z;
+        model_triangle_list[i][2][0] = tri_add[2].x;
+        model_triangle_list[i][2][1] = tri_add[2].y;
+        model_triangle_list[i][2][2] = tri_add[2].z;
+        i++;
+        std::cout << "Added tri#" << i << "\n";
+    }
+    num_triangles = i;
 }
 
 void insertAt(float x, float y, float z) {
@@ -533,6 +593,17 @@ int main(int argc, char** argv)
 
   model.clear();
 
+  model_triangle_list = (float ***)calloc(max_num_triangles, sizeof(float **));
+  model_triangle_colors = (float ***)calloc(max_num_triangles, sizeof(float **));
+  for(int i = 0; i < max_num_triangles; i++) {
+      model_triangle_list[i] = (float **)calloc(3, sizeof(float *));
+      model_triangle_colors[i] = (float **)calloc(3, sizeof(float *));
+      for(int j = 0; j < 3; j++) {
+          model_triangle_list[i][j] = (float *)calloc(3, sizeof(float));
+          model_triangle_colors[i][j] = (float *)calloc(3, sizeof(float));
+      }
+  }
+
   //model_triangle_list.clear();
   //model_triangle_colors.clear();
 
@@ -575,10 +646,37 @@ int main(int argc, char** argv)
       std::cout << "\n";
   }
   */
+  printModel();
+  printTriangleList();
+  insertAt(0, 0, 0);
+  
+  printModel();
+  printTriangleList();
+  insertAt(0, 0, N_UNITS);
+  
+  printModel();
+  printTriangleList();
+  insertAt(N_UNITS, 0, 0);
+  
+  printModel();
+  printTriangleList();
+  for(int i = 0; i < max_num_triangles; i++) {
+      for(int j = 0; j < 3; j++) {
+          free(model_triangle_list[i][j]);
+          free(model_triangle_colors[i][j]);
+      }
+      free(model_triangle_list[i]);
+      free(model_triangle_colors[i]);
+  }
+  free(model_triangle_list);
+  free(model_triangle_colors);
+  return 0;
+  /*
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
   cursorInitVertexBufferGL();
+  */
 
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0)
@@ -595,6 +693,16 @@ int main(int argc, char** argv)
     }
   
   glfwTerminate();
+  for(int i = 0; i < max_num_triangles; i++) {
+      for(int j = 0; j < 3; j++) {
+          free(model_triangle_list[i][j]);
+          free(model_triangle_colors[i][j]);
+      }
+      free(model_triangle_list[i]);
+      free(model_triangle_colors[i]);
+  }
+  free(model_triangle_list);
+  free(model_triangle_colors);
   return 0;
 }
 
