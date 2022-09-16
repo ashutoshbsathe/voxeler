@@ -103,6 +103,7 @@ float *model_triangle_list;
 //std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
 #define MODEL_COLORS(i, j, k) (model_triangle_colors[3*3*i + 3*j + k])
 float *model_triangle_colors;
+bool update_vbo = false;
 unsigned long num_triangles = 0, max_num_triangles = 6 * N_CELLS * N_CELLS * 2;
 
 float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
@@ -431,6 +432,7 @@ void insertAt(float x, float y, float z) {
 
 void insertAtCursor() {
     insertAt(cursor_x, cursor_y, cursor_z);
+    update_vbo = true;
 }
 
 void gridInitShadersGL(void)
@@ -592,6 +594,13 @@ void renderGL(void)
   // Finally draw the model
   glUseProgram(model_shader_program);
   glBindVertexArray(model_vao);
+  if(update_vbo) {
+      glBindBuffer (GL_ARRAY_BUFFER, model_vbo);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, max_num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
+      glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), max_num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
+      update_vbo = false;
+      std::cout << "num_triangles = " << num_triangles << "\n";
+  }
   glUniformMatrix4fv(model_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glDrawArrays(GL_TRIANGLES, 0, num_triangles * 3);
 }
