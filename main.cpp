@@ -327,7 +327,7 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     return std::pair<std::vector<Triangle>, std::vector<Triangle>>(drawList, deleteList);
 }
 
-void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_remove) {
+void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_remove, Point color) {
     // convert `to_remove` to a set so that searching that becomes logarithmic, will need to define 
     // a total ordering over triangles 
     // TODO: Make sure opposite face triangles are in same order and define a triangle compare function
@@ -407,15 +407,15 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         MODEL_TRIANGLES(i,2,1) = tri_add.p3.y;
         MODEL_TRIANGLES(i,2,2) = tri_add.p3.z;
 
-        MODEL_COLORS(i,0,0) = 1.0;
-        MODEL_COLORS(i,0,1) = 0;
-        MODEL_COLORS(i,0,2) = 1.0;
-        MODEL_COLORS(i,1,0) = 1.0;
-        MODEL_COLORS(i,1,1) = 0;
-        MODEL_COLORS(i,1,2) = 1.0;
-        MODEL_COLORS(i,2,0) = 1.0;
-        MODEL_COLORS(i,2,1) = 0;
-        MODEL_COLORS(i,2,2) = 1.0;
+        MODEL_COLORS(i,0,0) = color.x;
+        MODEL_COLORS(i,0,1) = color.y;
+        MODEL_COLORS(i,0,2) = color.z;
+        MODEL_COLORS(i,1,0) = color.x;
+        MODEL_COLORS(i,1,1) = color.y;
+        MODEL_COLORS(i,1,2) = color.z;
+        MODEL_COLORS(i,2,0) = color.x;
+        MODEL_COLORS(i,2,1) = color.y;
+        MODEL_COLORS(i,2,2) = color.z;
         
         i++;
     }
@@ -425,24 +425,12 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
 void insertAt(float x, float y, float z) {
     auto triangles = trianglesAt(Point(x, y, z));
     auto to_add = triangles.first, to_remove = triangles.second;
-    updateTrianglesList(to_add, to_remove);
+    updateTrianglesList(to_add, to_remove, Point(cursor_red, cursor_green, cursor_blue));
     model[Point(x, y, z)] = Point(cursor_red, cursor_green, cursor_blue);
-}
-
-void deleteAt(float x, float y, float z) {
-    auto triangles = trianglesAt(Point(x, y, z));
-    // TODO: verify that this is indeed the case for all cubes
-    auto to_add = triangles.second, to_remove = triangles.first;
-    updateTrianglesList(to_add, to_remove);
-    model.erase(Point(x, y, z));
 }
 
 void insertAtCursor() {
     insertAt(cursor_x, cursor_y, cursor_z);
-}
-
-void deleteAtCursor() {
-    deleteAt(cursor_x, cursor_y, cursor_z);
 }
 
 void gridInitShadersGL(void)
