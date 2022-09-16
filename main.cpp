@@ -264,7 +264,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
     std::vector<glm::vec3> bottom_1{c, a, d}, bottom_2{c, b, a};
     std::vector<glm::vec3> top_1{g, e, h}, top_2{g, f, e};
     std::vector<glm::vec3> front_1{d, e, a}, front_2{d, h, e};
-    std::vector<glm::vec3> back_1{c, b, f}, back_2{c, f, g};
+    std::vector<glm::vec3> back_1{c, f, b}, back_2{c, g, f};
     
     // Bottom face
     if(model.find(c + glm::vec3(0, -N_UNITS, 0)) != model.end()) {
@@ -621,7 +621,7 @@ int main(int argc, char** argv)
       }
       //std::cout << "i = " << i << " ended\n";
   }
-  /*
+  /**/
   for(int i = 0; i < 12; i++) {
       std::cout << "Triangle #" << i+1 << ": [ ";
       for(int j = 0; j < 3; j++) {
@@ -645,7 +645,8 @@ int main(int argc, char** argv)
       }
       std::cout << "\n";
   }
-  */
+  /**/
+  /*
   printModel();
   printTriangleList();
   insertAt(0, 0, 0);
@@ -671,12 +672,13 @@ int main(int argc, char** argv)
   free(model_triangle_list);
   free(model_triangle_colors);
   return 0;
-  /*
+  */
+  /**/
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
   cursorInitVertexBufferGL();
-  */
+  /**/
 
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0)
