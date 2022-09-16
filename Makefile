@@ -6,8 +6,8 @@ LDFLAGS=-L/usr/local/lib
 CPPFLAGS=-I/usr/local/include
 
 BIN=a1model
-SRCS=main.cpp gl_framework.cpp shader_util.cpp 
-INCLUDES=gl_framework.hpp shader_util.hpp
+SRCS=point.cpp triangle.cpp main.cpp gl_framework.cpp shader_util.cpp
+INCLUDES=gl_framework.hpp shader_util.hpp point.hpp triangle.hpp
 
 all: $(BIN)
 

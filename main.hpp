@@ -3,6 +3,9 @@
 
 #include <bits/stdc++.h>
 
+#include "point.hpp"
+#include "triangle.hpp"
+
 #include "gl_framework.hpp"
 #include "shader_util.hpp"
 

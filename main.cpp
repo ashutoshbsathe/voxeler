@@ -93,7 +93,8 @@ bool compare_tri(std::vector<glm::vec3> t1, std::vector<glm::vec3> t2) {
 }
 bool (*compare_vec3_ptr)(glm::vec3, glm::vec3) = compare_vec3;
 bool (*compare_tri_ptr)(std::vector<glm::vec3>, std::vector<glm::vec3>) = compare_tri;
-std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
+//std::map<glm::vec3, glm::vec3, bool(*)(glm::vec3, glm::vec3)> model(compare_vec3_ptr);
+std::map<Point, Point> model; // TODO: Make this unordered
 // TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
 // Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
 //std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
@@ -225,7 +226,7 @@ void cubeAt(float x, float y, float z) {
     }
 }
 
-std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>> trianglesAt(glm::vec3 c) {
+std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     /* Ref for cube ascii : https://codegolf.stackexchange.com/q/189
      *         (+Y)
      *         |
@@ -247,27 +248,27 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
      *  Else, triangles corr to that face will be added to (drawList)
      * Returns the pair (drawList, deleteList)
      */
-    glm::vec3 a, b, d, e, f, g, h;
-    std::vector<std::vector<glm::vec3>> drawList, deleteList;
+    Point a, b, d, e, f, g, h;
+    std::vector<Triangle> drawList, deleteList;
 
-    a = c + glm::vec3(N_UNITS, 0, N_UNITS);
-    b = c + glm::vec3(N_UNITS, 0, 0);
-    d = c + glm::vec3(0, 0, N_UNITS);
+    a = c + Point(N_UNITS, 0, N_UNITS);
+    b = c + Point(N_UNITS, 0, 0);
+    d = c + Point(0, 0, N_UNITS);
 
-    e = c + glm::vec3(N_UNITS, N_UNITS, N_UNITS);
-    f = c + glm::vec3(N_UNITS, N_UNITS, 0);
-    g = c + glm::vec3(0, N_UNITS, 0);
-    h = c + glm::vec3(0, N_UNITS, N_UNITS);
+    e = c + Point(N_UNITS, N_UNITS, N_UNITS);
+    f = c + Point(N_UNITS, N_UNITS, 0);
+    g = c + Point(0, N_UNITS, 0);
+    h = c + Point(0, N_UNITS, N_UNITS);
     
-    std::vector<glm::vec3> left_1{c, h, g}, left_2{c, d, h};
-    std::vector<glm::vec3> right_1{b, a, e}, right_2{b, e, f};
-    std::vector<glm::vec3> bottom_1{c, a, d}, bottom_2{c, b, a};
-    std::vector<glm::vec3> top_1{g, e, h}, top_2{g, f, e};
-    std::vector<glm::vec3> front_1{d, e, a}, front_2{d, h, e};
-    std::vector<glm::vec3> back_1{c, f, b}, back_2{c, g, f};
+    Triangle left_1(c, h, g), left_2(c, d, h);
+    Triangle right_1(b, a, e), right_2(b, e, f);
+    Triangle bottom_1(c, a, d), bottom_2(c, b, a);
+    Triangle top_1(g, e, h), top_2(g, f, e);
+    Triangle front_1(d, e, a), front_2(d, h, e);
+    Triangle back_1(c, f, b), back_2(c, g, f);
     
     // Bottom face
-    if(model.find(c + glm::vec3(0, -N_UNITS, 0)) != model.end()) {
+    if(model.find(c + Point(0, -N_UNITS, 0)) != model.end()) {
         deleteList.push_back(bottom_1);
         deleteList.push_back(bottom_2);
     }
@@ -276,7 +277,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(bottom_2);
     }
     // Top face
-    if(model.find(c + glm::vec3(0, N_UNITS, 0)) != model.end()) {
+    if(model.find(c + Point(0, N_UNITS, 0)) != model.end()) {
         deleteList.push_back(top_1);
         deleteList.push_back(top_2);
     }
@@ -285,7 +286,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(top_2);
     }
     // Right face
-    if(model.find(c + glm::vec3(N_UNITS, 0, 0)) != model.end()) {
+    if(model.find(c + Point(N_UNITS, 0, 0)) != model.end()) {
         deleteList.push_back(right_1);
         deleteList.push_back(right_2);
     }
@@ -294,7 +295,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(right_2);
     }
     // Left face
-    if(model.find(c + glm::vec3(-N_UNITS, 0, 0)) != model.end()) {
+    if(model.find(c + Point(-N_UNITS, 0, 0)) != model.end()) {
         deleteList.push_back(left_1);
         deleteList.push_back(left_2);
     }
@@ -303,7 +304,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(left_2);
     }
     // Front face
-    if(model.find(c + glm::vec3(0, 0, N_UNITS)) != model.end()) {
+    if(model.find(c + Point(0, 0, N_UNITS)) != model.end()) {
         deleteList.push_back(front_1);
         deleteList.push_back(front_2);
     }
@@ -312,7 +313,7 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(front_2);
     }
     // Back face
-    if(model.find(c + glm::vec3(0, 0, -N_UNITS)) != model.end()) {
+    if(model.find(c + Point(0, 0, -N_UNITS)) != model.end()) {
         deleteList.push_back(back_1);
         deleteList.push_back(back_2);
     }
@@ -321,10 +322,10 @@ std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3
         drawList.push_back(back_2);
     }
 
-    return std::pair<std::vector<std::vector<glm::vec3>>, std::vector<std::vector<glm::vec3>>>(drawList, deleteList);
+    return std::pair<std::vector<Triangle>, std::vector<Triangle>>(drawList, deleteList);
 }
 
-void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector<std::vector<glm::vec3>> to_remove) {
+void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_remove) {
     // convert `to_remove` to a set so that searching that becomes logarithmic, will need to define 
     // a total ordering over triangles 
     // TODO: Make sure opposite face triangles are in same order and define a triangle compare function
@@ -336,27 +337,27 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
 	
 	unsigned long i=0, j=0;
 	// converting the `to_remove` vector to a set
-	std::set<std::vector<glm::vec3>, bool(*)(std::vector<glm::vec3>, std::vector<glm::vec3>)> to_remove_set(to_remove.begin(), to_remove.end(), compare_tri_ptr);
+    std::set<Triangle> to_remove_set(to_remove.begin(), to_remove.end()); // TODO: make unordered set
     for(j = 0; j < num_triangles; j++) {
         std::cout << "At tri#"<<j<<"/" << max_num_triangles << ", i = " << i << "\n";
         // is j'th triangle to be removed ?
-        std::vector<glm::vec3> tri_j = {
-            glm::vec3(
+        Triangle tri_j(
+            Point(
                 model_triangle_list[j][0][0],
                 model_triangle_list[j][0][1],
                 model_triangle_list[j][0][2]
             ),
-            glm::vec3(
+            Point(
                 model_triangle_list[j][1][0],
                 model_triangle_list[j][1][1],
                 model_triangle_list[j][1][2]
             ),
-            glm::vec3(
+            Point(
                 model_triangle_list[j][2][0],
                 model_triangle_list[j][2][1],
                 model_triangle_list[j][2][2]
             )
-        };
+        );
         if(to_remove_set.find(tri_j) == to_remove_set.end()) {
             // tri_j not to be removed
             // copy tri_j to tri_i
@@ -376,15 +377,15 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
         }
     }
     for(auto tri_add : to_add) {
-        model_triangle_list[i][0][0] = tri_add[0].x;
-        model_triangle_list[i][0][1] = tri_add[0].y;
-        model_triangle_list[i][0][2] = tri_add[0].z;
-        model_triangle_list[i][1][0] = tri_add[1].x;
-        model_triangle_list[i][1][1] = tri_add[1].y;
-        model_triangle_list[i][1][2] = tri_add[1].z;
-        model_triangle_list[i][2][0] = tri_add[2].x;
-        model_triangle_list[i][2][1] = tri_add[2].y;
-        model_triangle_list[i][2][2] = tri_add[2].z;
+        model_triangle_list[i][0][0] = tri_add.p1.x;
+        model_triangle_list[i][0][1] = tri_add.p1.y;
+        model_triangle_list[i][0][2] = tri_add.p1.z;
+        model_triangle_list[i][1][0] = tri_add.p2.x;
+        model_triangle_list[i][1][1] = tri_add.p2.y;
+        model_triangle_list[i][1][2] = tri_add.p2.z;
+        model_triangle_list[i][2][0] = tri_add.p3.x;
+        model_triangle_list[i][2][1] = tri_add.p3.y;
+        model_triangle_list[i][2][2] = tri_add.p3.z;
         i++;
         std::cout << "Added tri#" << i << "\n";
     }
@@ -392,18 +393,18 @@ void updateTrianglesList(std::vector<std::vector<glm::vec3>> to_add, std::vector
 }
 
 void insertAt(float x, float y, float z) {
-    auto triangles = trianglesAt(glm::vec3(x, y, z));
+    auto triangles = trianglesAt(Point(x, y, z));
     auto to_add = triangles.first, to_remove = triangles.second;
     updateTrianglesList(to_add, to_remove);
-    model[glm::vec3(x, y, z)] = glm::vec3(cursor_red, cursor_green, cursor_blue);
+    model[Point(x, y, z)] = Point(cursor_red, cursor_green, cursor_blue);
 }
 
 void deleteAt(float x, float y, float z) {
-    auto triangles = trianglesAt(glm::vec3(x, y, z));
+    auto triangles = trianglesAt(Point(x, y, z));
     // TODO: verify that this is indeed the case for all cubes
     auto to_add = triangles.second, to_remove = triangles.first;
     updateTrianglesList(to_add, to_remove);
-    model.erase(glm::vec3(x, y, z));
+    model.erase(Point(x, y, z));
 }
 
 void insertAtCursor() {
@@ -611,17 +612,19 @@ int main(int argc, char** argv)
   //cube_triangle_colors.clear();
   
   // since model is empty it should return all triangles
-  auto tmp = trianglesAt(glm::vec3(0, 0, 0)).first;
+  auto tmp = trianglesAt(Point(0, 0, 0)).first;
   for(int i = 0; i < tmp.size(); i++) {
-      for(int j = 0; j < 3; j++) {
-          cube_triangle_list[i][j][0] = tmp[i][j].x;
-          cube_triangle_list[i][j][1] = tmp[i][j].y;
-          cube_triangle_list[i][j][2] = tmp[i][j].z;
-          //std::cout << "(" << tmp[i][j].x << ", " << tmp[i][j].y << ", " << tmp[i][j].z << ")\n";
-      }
-      //std::cout << "i = " << i << " ended\n";
+        cube_triangle_list[i][0][0] = tmp[i].p1.x;
+        cube_triangle_list[i][0][1] = tmp[i].p1.y;
+        cube_triangle_list[i][0][2] = tmp[i].p1.z;
+        cube_triangle_list[i][1][0] = tmp[i].p2.x;
+        cube_triangle_list[i][1][1] = tmp[i].p2.y;
+        cube_triangle_list[i][1][2] = tmp[i].p2.z;
+        cube_triangle_list[i][2][0] = tmp[i].p3.x;
+        cube_triangle_list[i][2][1] = tmp[i].p3.y;
+        cube_triangle_list[i][2][2] = tmp[i].p3.z;
   }
-  /**/
+  /*
   for(int i = 0; i < 12; i++) {
       std::cout << "Triangle #" << i+1 << ": [ ";
       for(int j = 0; j < 3; j++) {
@@ -645,8 +648,8 @@ int main(int argc, char** argv)
       }
       std::cout << "\n";
   }
+  */
   /**/
-  /*
   printModel();
   printTriangleList();
   insertAt(0, 0, 0);
@@ -672,13 +675,13 @@ int main(int argc, char** argv)
   free(model_triangle_list);
   free(model_triangle_colors);
   return 0;
-  */
   /**/
+  /*
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
   cursorInitVertexBufferGL();
-  /**/
+  */
 
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0)
