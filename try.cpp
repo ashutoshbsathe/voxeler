@@ -1,14 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+#define X 3 
+#define Y 4 
+#define Z 5
+#define ARR(i,j,k) (b[Y*Z*i + Z*j + k])
 int main() {
-    int **a = (int **)calloc(2, sizeof(int *));
-    for(int i = 0; i < 2; i++) {
-        a[i] = (int *)calloc(5, sizeof(int));
-        for(int j = 0; j < 5; j++) {
-            a[i][j] = (i+1)*5 + j+1;
-            cout << a[i][j] << endl;
+    int *b = (int *)calloc(X*Y*Z, sizeof(int));
+    int count = 0;
+    for(int i = 0; i < X; i++) {
+        for(int j = 0; j < Y; j++) {
+            for(int k = 0; k < Z; k++) {
+                ARR(i, j, k) = count++;
+            }
         }
     }
-    cout << a[1][4];
+    for(int i = 0; i < X*Y*Z; i++) {
+        std::cout << b[i] << " ";
+    }
 }

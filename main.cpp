@@ -98,9 +98,11 @@ std::map<Point, Point> model; // TODO: Make this unordered
 // TODO: Allocate as arrays with maximum number possible as (N_CELLS)^3 times 2
 // Also maintain an unsigned integer `size` variable. Initially `size = 0` but size updates as we add or remove triangles
 //std::vector<std::vector<glm::vec3>> model_triangle_list; // TODO: allocate an array on heap instead
-float ***model_triangle_list;
+#define MODEL_TRIANGLES(i, j, k) (model_triangle_list[3*3*i + 3*j + k])
+float *model_triangle_list;
 //std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
-float ***model_triangle_colors;
+#define MODEL_COLORS(i, j, k) (model_triangle_colors[3*3*i + 3*j + k])
+float *model_triangle_colors;
 unsigned long num_triangles = 0, max_num_triangles = 6 * N_CELLS * N_CELLS * 2;
 
 float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
@@ -153,7 +155,7 @@ void printTriangleList() {
     for(unsigned long i = 0; i < num_triangles; i++) {
         std::cout << "\t[ ";
         for(int j = 0; j < 3; j++) {
-            std::cout << "(" << model_triangle_list[i][j][0] << ", " << model_triangle_list[i][j][1] << ", " << model_triangle_list[i][j][2] << ") ";
+            std::cout << "(" << MODEL_TRIANGLES(i,j,0) << ", " << MODEL_TRIANGLES(i,j,1) << ", " << MODEL_TRIANGLES(i,j,2) << ") ";
         }
         std::cout << "]\n";
     }
@@ -343,56 +345,78 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         // is j'th triangle to be removed ?
         Triangle tri_j(
             Point(
-                model_triangle_list[j][0][0],
-                model_triangle_list[j][0][1],
-                model_triangle_list[j][0][2]
+                MODEL_TRIANGLES(j,0,0),
+                MODEL_TRIANGLES(j,0,1),
+                MODEL_TRIANGLES(j,0,2)
             ),
             Point(
-                model_triangle_list[j][1][0],
-                model_triangle_list[j][1][1],
-                model_triangle_list[j][1][2]
+                MODEL_TRIANGLES(j,1,0),
+                MODEL_TRIANGLES(j,1,1),
+                MODEL_TRIANGLES(j,1,2)
             ),
             Point(
-                model_triangle_list[j][2][0],
-                model_triangle_list[j][2][1],
-                model_triangle_list[j][2][2]
+                MODEL_TRIANGLES(j,2,0),
+                MODEL_TRIANGLES(j,2,1),
+                MODEL_TRIANGLES(j,2,2)
             )
         );
         if(to_remove_set.find(tri_j) == to_remove_set.end()) {
             // tri_j not to be removed
             // copy tri_j to tri_i
-            model_triangle_list[i][0][0] = model_triangle_list[j][0][0];
-            model_triangle_list[i][0][1] = model_triangle_list[j][0][1];
-            model_triangle_list[i][0][2] = model_triangle_list[j][0][2];
-            model_triangle_list[i][1][0] = model_triangle_list[j][1][0];
-            model_triangle_list[i][1][1] = model_triangle_list[j][1][1];
-            model_triangle_list[i][1][2] = model_triangle_list[j][1][2];
-            model_triangle_list[i][2][0] = model_triangle_list[j][2][0];
-            model_triangle_list[i][2][1] = model_triangle_list[j][2][1];
-            model_triangle_list[i][2][2] = model_triangle_list[j][2][2];
+            MODEL_TRIANGLES(i,0,0) = MODEL_TRIANGLES(j,0,0);
+            MODEL_TRIANGLES(i,0,1) = MODEL_TRIANGLES(j,0,1);
+            MODEL_TRIANGLES(i,0,2) = MODEL_TRIANGLES(j,0,2);
+            MODEL_TRIANGLES(i,1,0) = MODEL_TRIANGLES(j,1,0);
+            MODEL_TRIANGLES(i,1,1) = MODEL_TRIANGLES(j,1,1);
+            MODEL_TRIANGLES(i,1,2) = MODEL_TRIANGLES(j,1,2);
+            MODEL_TRIANGLES(i,2,0) = MODEL_TRIANGLES(j,2,0);
+            MODEL_TRIANGLES(i,2,1) = MODEL_TRIANGLES(j,2,1);
+            MODEL_TRIANGLES(i,2,2) = MODEL_TRIANGLES(j,2,2);
+
+            MODEL_COLORS(i,0,0) = MODEL_COLORS(j,0,0);
+            MODEL_COLORS(i,0,1) = MODEL_COLORS(j,0,1);
+            MODEL_COLORS(i,0,2) = MODEL_COLORS(j,0,2);
+            MODEL_COLORS(i,1,0) = MODEL_COLORS(j,1,0);
+            MODEL_COLORS(i,1,1) = MODEL_COLORS(j,1,1);
+            MODEL_COLORS(i,1,2) = MODEL_COLORS(j,1,2);
+            MODEL_COLORS(i,2,0) = MODEL_COLORS(j,2,0);
+            MODEL_COLORS(i,2,1) = MODEL_COLORS(j,2,1);
+            MODEL_COLORS(i,2,2) = MODEL_COLORS(j,2,2);
+
             i++;
         }
         else {
             std::cout << "Skipping j = " << j << ": [ ";
             for(int k = 0; k < 3; k++) {
-                std::cout << "(" << model_triangle_list[j][k][0];
-                std::cout << "," << model_triangle_list[j][k][1];
-                std::cout << "," << model_triangle_list[j][k][2];
+                std::cout << "(" << MODEL_TRIANGLES(j,k,0);
+                std::cout << "," << MODEL_TRIANGLES(j,k,1);
+                std::cout << "," << MODEL_TRIANGLES(j,k,2);
                 std::cout << ") ";
             }
             std::cout << "]\n";
         }
     }
     for(auto tri_add : to_add) {
-        model_triangle_list[i][0][0] = tri_add.p1.x;
-        model_triangle_list[i][0][1] = tri_add.p1.y;
-        model_triangle_list[i][0][2] = tri_add.p1.z;
-        model_triangle_list[i][1][0] = tri_add.p2.x;
-        model_triangle_list[i][1][1] = tri_add.p2.y;
-        model_triangle_list[i][1][2] = tri_add.p2.z;
-        model_triangle_list[i][2][0] = tri_add.p3.x;
-        model_triangle_list[i][2][1] = tri_add.p3.y;
-        model_triangle_list[i][2][2] = tri_add.p3.z;
+        MODEL_TRIANGLES(i,0,0) = tri_add.p1.x;
+        MODEL_TRIANGLES(i,0,1) = tri_add.p1.y;
+        MODEL_TRIANGLES(i,0,2) = tri_add.p1.z;
+        MODEL_TRIANGLES(i,1,0) = tri_add.p2.x;
+        MODEL_TRIANGLES(i,1,1) = tri_add.p2.y;
+        MODEL_TRIANGLES(i,1,2) = tri_add.p2.z;
+        MODEL_TRIANGLES(i,2,0) = tri_add.p3.x;
+        MODEL_TRIANGLES(i,2,1) = tri_add.p3.y;
+        MODEL_TRIANGLES(i,2,2) = tri_add.p3.z;
+
+        MODEL_COLORS(i,0,0) = 1.0;
+        MODEL_COLORS(i,0,1) = 0;
+        MODEL_COLORS(i,0,2) = 1.0;
+        MODEL_COLORS(i,1,0) = 1.0;
+        MODEL_COLORS(i,1,1) = 0;
+        MODEL_COLORS(i,1,2) = 1.0;
+        MODEL_COLORS(i,2,0) = 1.0;
+        MODEL_COLORS(i,2,1) = 0;
+        MODEL_COLORS(i,2,2) = 1.0;
+        
         i++;
     }
     num_triangles = i;
@@ -451,6 +475,21 @@ void cursorInitShadersGL(void)
   cursor_uModelViewProjectMatrix_id = glGetUniformLocation(cursor_shader_program, "uModelViewProjectMatrix");
 }
 
+void modelInitShadersGL(void)
+{
+  std::string vertex_shader_file("cube_vs.glsl");
+  std::string fragment_shader_file("cube_fs.glsl");
+
+  std::vector<GLuint> shaderList;
+  shaderList.push_back(csX75::LoadShaderGL(GL_VERTEX_SHADER, vertex_shader_file));
+  shaderList.push_back(csX75::LoadShaderGL(GL_FRAGMENT_SHADER, fragment_shader_file));
+
+  model_shader_program = csX75::CreateProgramGL(shaderList);
+  model_position_id = glGetAttribLocation(model_shader_program, "vPosition");
+  model_color_id = glGetAttribLocation(model_shader_program, "vColor");
+  model_uModelViewProjectMatrix_id = glGetUniformLocation(model_shader_program, "uModelViewProjectMatrix");
+}
+
 void gridInitVertexBufferGL(void)
 {
   //Ask GL for a Vertex Attribute Object (grid_vao)
@@ -497,6 +536,32 @@ void cursorInitVertexBufferGL(void)
   glVertexAttribPointer(cursor_color_id, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(36 * 3 * sizeof(float)));
 }
 
+void modelInitVertexBufferGL(void)
+{
+  //Ask GL for a Vertex Attribute Object (model_vao)
+  glGenVertexArrays (1, &model_vao);
+  //Set it as the current array to be used by binding it
+  glBindVertexArray (model_vao);
+  //Ask GL for a Vertex Buffer Object (model_vbo)
+  glGenBuffers (1, &model_vbo);
+  //Set it as the current buffer to be used by binding it
+  glBindBuffer (GL_ARRAY_BUFFER, model_vbo);
+  //Copy the points into the current buffer - 9 float values, start pointer and static data
+  glBufferData (GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof (float) + max_num_triangles * 3 * 3 * sizeof(float), NULL, GL_STATIC_DRAW);
+  //glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_coords);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, max_num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
+  glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), max_num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
+
+  //Enable the vertex attribute
+  glEnableVertexAttribArray (model_position_id);
+  //This the layout of our first vertex buffer
+  //"0" means define the layout for attribute number 0. "3" means that the variables are vec3 made from every 3 floats 
+  glVertexAttribPointer (model_position_id, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+  glEnableVertexAttribArray(model_color_id);
+  glVertexAttribPointer(model_color_id, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(max_num_triangles * 3 * 3 * sizeof(float)));
+}
+
 void renderGL(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -537,6 +602,10 @@ void renderGL(void)
   glDrawArrays(GL_TRIANGLES, 0, 36);
 
   // Finally draw the model
+  glUseProgram(model_shader_program);
+  glBindVertexArray(model_vao);
+  glUniformMatrix4fv(model_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
+  glDrawArrays(GL_TRIANGLES, 0, num_triangles * 3);
 }
 
 int main(int argc, char** argv)
@@ -600,16 +669,8 @@ int main(int argc, char** argv)
 
   model.clear();
 
-  model_triangle_list = (float ***)calloc(max_num_triangles, sizeof(float **));
-  model_triangle_colors = (float ***)calloc(max_num_triangles, sizeof(float **));
-  for(int i = 0; i < max_num_triangles; i++) {
-      model_triangle_list[i] = (float **)calloc(3, sizeof(float *));
-      model_triangle_colors[i] = (float **)calloc(3, sizeof(float *));
-      for(int j = 0; j < 3; j++) {
-          model_triangle_list[i][j] = (float *)calloc(3, sizeof(float));
-          model_triangle_colors[i][j] = (float *)calloc(3, sizeof(float));
-      }
-  }
+  model_triangle_list = (float *)calloc(max_num_triangles * 3 * 3, sizeof(float));
+  model_triangle_colors = (float *)calloc(max_num_triangles * 3 * 3, sizeof(float));
 
   //model_triangle_list.clear();
   //model_triangle_colors.clear();
@@ -670,25 +731,24 @@ int main(int argc, char** argv)
   
   printModel();
   printTriangleList();
-  for(int i = 0; i < max_num_triangles; i++) {
-      for(int j = 0; j < 3; j++) {
-          free(model_triangle_list[i][j]);
-          free(model_triangle_colors[i][j]);
-      }
-      free(model_triangle_list[i]);
-      free(model_triangle_colors[i]);
-  }
-  free(model_triangle_list);
-  free(model_triangle_colors);
-  return 0;
   /**/
-  /*
+  /**/
   gridInitShadersGL();
   gridInitVertexBufferGL();
   cursorInitShadersGL();
   cursorInitVertexBufferGL();
+  modelInitShadersGL();
+  modelInitVertexBufferGL();
+  /**/
+  for(int i = 0; i < num_triangles * 3 * 3; i++) {
+      std::cout << *((float *)model_triangle_list + i) << ", " << *((float *)model_triangle_colors + i) << "\n";
+  }
+  std::cout << "-------\nnum_triangles = " << num_triangles << "\n";
+  /*
+  for(int i = 0; i < 12 * 3 * 3; i++) {
+      std::cout << *((float *)cube_triangle_list + i) << ", " << *((float *)cube_colors + i) << "\n";
+  }
   */
-
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0)
     {
@@ -704,14 +764,6 @@ int main(int argc, char** argv)
     }
   
   glfwTerminate();
-  for(int i = 0; i < max_num_triangles; i++) {
-      for(int j = 0; j < 3; j++) {
-          free(model_triangle_list[i][j]);
-          free(model_triangle_colors[i][j]);
-      }
-      free(model_triangle_list[i]);
-      free(model_triangle_colors[i]);
-  }
   free(model_triangle_list);
   free(model_triangle_colors);
   return 0;
