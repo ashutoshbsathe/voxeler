@@ -29,6 +29,8 @@ GLfloat xrot = 0, yrot = 0, zrot = 0, rotamount = 0.1;
 GLfloat cursor_x = 0, cursor_y = 0, cursor_z = 0, moveamount = N_UNITS, cursor_max = DRAW_MAX, cursor_min = DRAW_MIN;
 GLfloat cursor_red = 1, cursor_green = 1, cursor_blue = 0;
 bool persp = false;
+float color_r=1.0, color_g=1.0, color_b=0.0;
+Point current_color(color_r, color_g, color_b);
 
 void insertAtCursor();
 #endif

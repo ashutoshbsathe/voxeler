@@ -1,7 +1,10 @@
 #include "gl_framework.hpp"
+#include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 extern bool persp;
 extern void insertAtCursor();
+extern float color_r, color_g, color_b;
+extern Point current_color;
 namespace csX75
 {
   //! Initialize GL State
@@ -95,6 +98,20 @@ namespace csX75
     else if(key == GLFW_KEY_P && action == GLFW_PRESS) {
         insertAtCursor();
     }
+
+	else if(key == GLFW_KEY_C && action == GLFW_PRESS){
+		float color_r, color_g, color_b;
+		std::cout<<"Changing the cursor color:\n";
+		std::cout<<"Enter 'r' component:";
+		std::cin>>color_r;
+		std::cout<<"Enter 'g' component:";
+		std::cin>>color_g;
+		std::cout<<"Enter 'b' component:";
+		std::cin>>color_b;
+		std::cout<<"Cursor color changed successfully.\n";
+		Point updateColor(color_r, color_g, color_b);
+		current_color = updateColor;
+	}
   }
 };  
   

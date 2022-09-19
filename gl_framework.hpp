@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "point.hpp"
 
 #include <iostream>
 // From Tutorial_02

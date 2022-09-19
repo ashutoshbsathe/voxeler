@@ -229,7 +229,7 @@ void cubeAt(float x, float y, float z) {
     }
 }
 
-std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
+std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Point cubeColor) {
     /* Ref for cube ascii : https://codegolf.stackexchange.com/q/189
      *         (+Y)
      *         |
@@ -262,18 +262,25 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     f = c + Point(N_UNITS, N_UNITS, 0);
     g = c + Point(0, N_UNITS, 0);
     h = c + Point(0, N_UNITS, N_UNITS);
+   
+	// Need to define these triangles with the passed cubeColor. 
+    Triangle left_1(c, h, g, cubeColor), left_2(c, d, h, cubeColor);
+    Triangle right_1(b, a, e, cubeColor), right_2(b, e, f, cubeColor);
+    Triangle bottom_1(c, a, d, cubeColor), bottom_2(c, b, a, cubeColor);
+    Triangle top_1(g, e, h, cubeColor), top_2(g, f, e, cubeColor);
+    Triangle front_1(d, e, a, cubeColor), front_2(d, h, e, cubeColor);
+    Triangle back_1(c, f, b, cubeColor), back_2(c, g, f, cubeColor);
     
-    Triangle left_1(c, h, g), left_2(c, d, h);
-    Triangle right_1(b, a, e), right_2(b, e, f);
-    Triangle bottom_1(c, a, d), bottom_2(c, b, a);
-    Triangle top_1(g, e, h), top_2(g, f, e);
-    Triangle front_1(d, e, a), front_2(d, h, e);
-    Triangle back_1(c, f, b), back_2(c, g, f);
-    
+	/*
+	 While checking, if we found a triangle already at some position, then delete that triangle along with the found color of the traingle from the model.
+	 i.e: if(model.find(c+Point(0, -N_UNITS, 0) != model.end()))
+	 => then deleteList.push_back(bottom_1.changeColor(model(c+Point(0,-N_UNITS,0)))), and do the same for the other triangle.
+
+	 */
     // Bottom face
     if(model.find(c + Point(0, -N_UNITS, 0)) != model.end()) {
-        deleteList.push_back(bottom_1);
-        deleteList.push_back(bottom_2);
+        deleteList.push_back(bottom_1.changeColor(model[c + Point(0, -N_UNITS, 0)]));
+        deleteList.push_back(bottom_2.changeColor(model[c + Point(0, -N_UNITS, 0)]));
     }
     else {
         drawList.push_back(bottom_1);
@@ -281,8 +288,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     }
     // Top face
     if(model.find(c + Point(0, N_UNITS, 0)) != model.end()) {
-        deleteList.push_back(top_1);
-        deleteList.push_back(top_2);
+        deleteList.push_back(top_1.changeColor(model[c + Point(0, N_UNITS, 0)]));
+        deleteList.push_back(top_2.changeColor(model[c + Point(0, N_UNITS, 0)]));
     }
     else {
         drawList.push_back(top_1);
@@ -290,8 +297,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     }
     // Right face
     if(model.find(c + Point(N_UNITS, 0, 0)) != model.end()) {
-        deleteList.push_back(right_1);
-        deleteList.push_back(right_2);
+        deleteList.push_back(right_1.changeColor(model[c + Point(N_UNITS, 0, 0)]));
+        deleteList.push_back(right_2.changeColor(model[c + Point(N_UNITS, 0, 0)]));
     }
     else {
         drawList.push_back(right_1);
@@ -299,8 +306,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     }
     // Left face
     if(model.find(c + Point(-N_UNITS, 0, 0)) != model.end()) {
-        deleteList.push_back(left_1);
-        deleteList.push_back(left_2);
+        deleteList.push_back(left_1.changeColor(model[c + Point(-N_UNITS, 0, 0)]));
+        deleteList.push_back(left_2.changeColor(model[c + Point(-N_UNITS, 0, 0)]));
     }
     else {
         drawList.push_back(left_1);
@@ -308,8 +315,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     }
     // Front face
     if(model.find(c + Point(0, 0, N_UNITS)) != model.end()) {
-        deleteList.push_back(front_1);
-        deleteList.push_back(front_2);
+        deleteList.push_back(front_1.changeColor(model[c + Point(0, 0, N_UNITS)]));
+        deleteList.push_back(front_2.changeColor(model[c + Point(0, 0, N_UNITS)]));
     }
     else {
         drawList.push_back(front_1);
@@ -317,8 +324,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     }
     // Back face
     if(model.find(c + Point(0, 0, -N_UNITS)) != model.end()) {
-        deleteList.push_back(back_1);
-        deleteList.push_back(back_2);
+        deleteList.push_back(back_1.changeColor(model[c + Point(0, 0, -N_UNITS)]));
+        deleteList.push_back(back_2.changeColor(model[c + Point(0, 0, -N_UNITS)]));
     }
     else {
         drawList.push_back(back_1);
@@ -328,7 +335,7 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c) {
     return std::pair<std::vector<Triangle>, std::vector<Triangle>>(drawList, deleteList);
 }
 
-void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_remove, Point color) {
+void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_remove) {
     // convert `to_remove` to a set so that searching that becomes logarithmic, will need to define 
     // a total ordering over triangles 
     // TODO: Make sure opposite face triangles are in same order and define a triangle compare function
@@ -359,7 +366,12 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
                 MODEL_TRIANGLES(j,2,0),
                 MODEL_TRIANGLES(j,2,1),
                 MODEL_TRIANGLES(j,2,2)
-            )
+            ),
+			Point(
+				MODEL_COLORS(j, 0, 0),
+				MODEL_COLORS(j, 0, 1),
+				MODEL_COLORS(j, 0, 2)
+			)
         );
         if(to_remove_set.find(tri_j) == to_remove_set.end()) {
             // tri_j not to be removed
@@ -407,7 +419,7 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         MODEL_TRIANGLES(i,2,0) = tri_add.p3.x;
         MODEL_TRIANGLES(i,2,1) = tri_add.p3.y;
         MODEL_TRIANGLES(i,2,2) = tri_add.p3.z;
-
+/* Old approach for storing colors
         MODEL_COLORS(i,0,0) = color.x;
         MODEL_COLORS(i,0,1) = color.y;
         MODEL_COLORS(i,0,2) = color.z;
@@ -417,21 +429,30 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         MODEL_COLORS(i,2,0) = color.x;
         MODEL_COLORS(i,2,1) = color.y;
         MODEL_COLORS(i,2,2) = color.z;
-        
+*/
+		MODEL_COLORS(i,0,0) = tri_add.c.x;
+        MODEL_COLORS(i,0,1) = tri_add.c.y;
+        MODEL_COLORS(i,0,2) = tri_add.c.z;
+        MODEL_COLORS(i,1,0) = tri_add.c.x;
+        MODEL_COLORS(i,1,1) = tri_add.c.y;
+        MODEL_COLORS(i,1,2) = tri_add.c.z;
+        MODEL_COLORS(i,2,0) = tri_add.c.x;
+        MODEL_COLORS(i,2,1) = tri_add.c.y;
+        MODEL_COLORS(i,2,2) = tri_add.c.z;       
         i++;
     }
     num_triangles = i;
 }
 
-void insertAt(float x, float y, float z) {
-    auto triangles = trianglesAt(Point(x, y, z));
+void insertAt(float x, float y, float z, Point cubeColor) {
+    auto triangles = trianglesAt(Point(x, y, z), cubeColor);
     auto to_add = triangles.first, to_remove = triangles.second;
-    updateTrianglesList(to_add, to_remove, Point(cursor_red, cursor_green, cursor_blue));
-    model[Point(x, y, z)] = Point(cursor_red, cursor_green, cursor_blue);
-}
+    updateTrianglesList(to_add, to_remove);
+    model[Point(x, y, z)] = cubeColor;
+};
 
 void insertAtCursor() {
-    insertAt(cursor_x, cursor_y, cursor_z);
+    insertAt(cursor_x, cursor_y, cursor_z, current_color);
     update_vbo = true;
 }
 
@@ -676,7 +697,7 @@ int main(int argc, char** argv)
   //cube_triangle_colors.clear();
   
   // since model is empty it should return all triangles
-  auto tmp = trianglesAt(Point(0, 0, 0)).first;
+  auto tmp = trianglesAt(Point(0, 0, 0), current_color).first;
   for(int i = 0; i < tmp.size(); i++) {
         cube_triangle_list[i][0][0] = tmp[i].p1.x;
         cube_triangle_list[i][0][1] = tmp[i].p1.y;
@@ -716,15 +737,15 @@ int main(int argc, char** argv)
   /**/
   printModel();
   printTriangleList();
-  insertAt(0, 0, 0);
+  insertAt(0, 0, 0, current_color);
   
   printModel();
   printTriangleList();
-  insertAt(0, 0, N_UNITS);
+  insertAt(0, 0, N_UNITS, current_color);
   
   printModel();
   printTriangleList();
-  insertAt(N_UNITS, 0, 0);
+  insertAt(N_UNITS, 0, 0, current_color);
   
   printModel();
   printTriangleList();
