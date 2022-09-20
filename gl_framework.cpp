@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 extern bool persp;
-extern void insertAtCursor();
+extern void insertAtCursor(), deleteAtCursor();
 extern float color_r, color_g, color_b;
 extern Point current_color;
 namespace csX75
@@ -98,7 +98,9 @@ namespace csX75
     else if(key == GLFW_KEY_P && action == GLFW_PRESS) {
         insertAtCursor();
     }
-
+    else if(key == GLFW_KEY_X && action == GLFW_PRESS) {
+        deleteAtCursor();
+    }
 	else if(key == GLFW_KEY_C && action == GLFW_PRESS){
 		float color_r, color_g, color_b;
 		std::cout<<"Changing the cursor color:\n";

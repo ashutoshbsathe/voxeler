@@ -419,17 +419,7 @@ void updateTrianglesList(std::vector<Triangle> to_add, std::vector<Triangle> to_
         MODEL_TRIANGLES(i,2,0) = tri_add.p3.x;
         MODEL_TRIANGLES(i,2,1) = tri_add.p3.y;
         MODEL_TRIANGLES(i,2,2) = tri_add.p3.z;
-/* Old approach for storing colors
-        MODEL_COLORS(i,0,0) = color.x;
-        MODEL_COLORS(i,0,1) = color.y;
-        MODEL_COLORS(i,0,2) = color.z;
-        MODEL_COLORS(i,1,0) = color.x;
-        MODEL_COLORS(i,1,1) = color.y;
-        MODEL_COLORS(i,1,2) = color.z;
-        MODEL_COLORS(i,2,0) = color.x;
-        MODEL_COLORS(i,2,1) = color.y;
-        MODEL_COLORS(i,2,2) = color.z;
-*/
+
 		MODEL_COLORS(i,0,0) = tri_add.c.x;
         MODEL_COLORS(i,0,1) = tri_add.c.y;
         MODEL_COLORS(i,0,2) = tri_add.c.z;
@@ -451,9 +441,24 @@ void insertAt(float x, float y, float z, Point cubeColor) {
     model[Point(x, y, z)] = cubeColor;
 };
 
+void deleteAt(float x, float y, float z) {
+    /* Make sure that model[x, y, z] exists */
+    auto triangles = trianglesAt(Point(x, y, z), Point(0, 1, 0));
+    auto to_add = triangles.first, to_remove = triangles.second;
+    updateTrianglesList(to_remove, to_add);
+    model.erase(Point(x, y, z));
+}
+
 void insertAtCursor() {
     insertAt(cursor_x, cursor_y, cursor_z, current_color);
     update_vbo = true;
+}
+
+void deleteAtCursor() {
+    if(model.find(Point(cursor_x, cursor_y, cursor_z)) != model.end()) {
+        deleteAt(cursor_x, cursor_y, cursor_z);
+        update_vbo = true;
+    }
 }
 
 void gridInitShadersGL(void)
