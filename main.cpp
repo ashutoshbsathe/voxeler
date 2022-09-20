@@ -487,15 +487,66 @@ void updateCursor() {
     }
 }
 
+void resetModel() {
+    num_triangles = 0;
+    model.clear();
+    update_model_vbo = true;
+}
+
 void saveModelToFile(std::string fname) {
     std::ofstream out;
     out.open(fname);
-    out << "N_CELLS = " << N_CELLS << "\n";
+    out << N_CELLS << "\n";
     for(auto it : model) {
-        out << "(" << it.first.x << "," << it.first.y << "," << it.first.z << ")->";
-        out << "(" << it.second.x << "," << it.second.y << "," << it.second.z << ")\n";
+        out << it.first.x << " " << it.first.y << " " << it.first.z << " ";
+        out << it.second.x << " " << it.second.y << " " << it.second.z << "\n";
     }
     out.close();
+}
+
+void readModelFromFile(std::string fname) {
+    resetModel();
+    std::ifstream in;
+    std::string line;
+    std::stringstream ss;
+    in.open(fname);
+    unsigned int n;
+    float x, y, z, r, g, b;
+    if(in.is_open()) {
+        try {
+            getline(in, line);
+            n = std::stoi(line);
+            if(n > N_CELLS) {
+                std::cout << "Loading model larger than current grid size (" << N_CELLS << "), will ignore everything outside current bounds.\n";
+            }
+            while(getline(in, line)) {
+                ss << line;
+                ss >> x >> y >> z >> r >> g >> b;
+                if(
+                        (x > cursor_min && x < cursor_max - moveamount) &&
+                        (y > cursor_min && x < cursor_max - moveamount) &&
+                        (z > cursor_min && x < cursor_max - moveamount)
+                ) {
+                    cursor_x = x;
+                    cursor_y = y;
+                    cursor_z = z;
+                    color_r = r;
+                    color_g = g;
+                    color_b = b;
+                    current_color = Point(color_r, color_g, color_b);
+                    insertAtCursor();
+                }
+                ss.clear();
+            }
+        }
+        catch(std::exception const &e) {
+            std::cout << "error : " << e.what() << "\n";
+        }
+    }
+    else {
+        std::cout << "Unable to open file\n";
+    }
+    in.close();
 }
 
 void gridInitShadersGL(void)
@@ -795,7 +846,7 @@ int main(int argc, char** argv)
       std::cout << "\n";
   }
   */
-  /**/
+  /*
   printModel();
   printTriangleList();
   insertAt(0, 0, 0, current_color);
@@ -810,7 +861,7 @@ int main(int argc, char** argv)
   
   printModel();
   printTriangleList();
-  /**/
+  */
   /**/
   gridInitShadersGL();
   gridInitVertexBufferGL();

@@ -2,8 +2,8 @@
 #include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 extern bool persp;
-extern void insertAtCursor(), deleteAtCursor(), updateCursor();
-extern void saveModelToFile(std::string);
+extern void insertAtCursor(), deleteAtCursor(), updateCursor(), resetModel();
+extern void saveModelToFile(std::string), readModelFromFile(std::string);
 extern float color_r, color_g, color_b;
 extern Point current_color;
 namespace csX75
@@ -126,6 +126,16 @@ namespace csX75
         std::cout << "Enter filename:";
         std::cin >> fname;
         saveModelToFile(fname);
+        std::cout << "Done!\n";
+	}
+	else if(key == GLFW_KEY_R && action == GLFW_PRESS){
+        resetModel();
+	}
+	else if(key == GLFW_KEY_K && action == GLFW_PRESS){ 
+        std::string fname;
+        std::cout << "Enter filename:";
+        std::cin >> fname;
+        readModelFromFile(fname);
         std::cout << "Done!\n";
 	}
   }
