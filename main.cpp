@@ -450,7 +450,13 @@ void deleteAt(float x, float y, float z) {
 }
 
 void insertAtCursor() {
-    insertAt(cursor_x, cursor_y, cursor_z, current_color);
+    if(model.find(Point(cursor_x, cursor_y, cursor_z)) == model.end()) {        
+        insertAt(cursor_x, cursor_y, cursor_z, current_color);
+    }
+    else {
+        deleteAt(cursor_x, cursor_y, cursor_z);
+        insertAt(cursor_x, cursor_y, cursor_z, current_color);
+    }
     update_vbo = true;
 }
 
