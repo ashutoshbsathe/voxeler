@@ -105,7 +105,7 @@ float *model_triangle_list;
 #define MODEL_COLORS(i, j, k) (model_triangle_colors[3*3*i + 3*j + k])
 float *model_triangle_colors;
 bool update_model_vbo = false, update_cursor_vbo = false;
-unsigned long num_triangles = 0, max_num_triangles = 6 * N_CELLS * N_CELLS * 2;
+unsigned long num_triangles = 0, max_num_triangles = 2 * (N_CELLS) * (N_CELLS + 1) * (2 * N_CELLS + 1);
 
 float default_cube_triangle_list[12][3][3], padded_cube_triangle_list[12][3][3], *cube_triangle_list = (float *)default_cube_triangle_list; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
