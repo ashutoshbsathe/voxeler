@@ -810,7 +810,9 @@ int main(int argc, char** argv)
         default_cube_triangle_list[i][2][1] = tmp[i].p3.y;
         default_cube_triangle_list[i][2][2] = tmp[i].p3.z;
 
-        float offset = N_UNITS / 2 - CURSOR_PADDING * N_UNITS / 2;
+        float offset = (1. - CURSOR_PADDING) * N_UNITS / 2.;
+        std::cout << "offset = " << offset << "\n";
+
         padded_cube_triangle_list[i][0][0] = CURSOR_PADDING * tmp[i].p1.x + offset;
         padded_cube_triangle_list[i][0][1] = CURSOR_PADDING * tmp[i].p1.y + offset;
         padded_cube_triangle_list[i][0][2] = CURSOR_PADDING * tmp[i].p1.z + offset;
@@ -820,6 +822,18 @@ int main(int argc, char** argv)
         padded_cube_triangle_list[i][2][0] = CURSOR_PADDING * tmp[i].p3.x + offset;
         padded_cube_triangle_list[i][2][1] = CURSOR_PADDING * tmp[i].p3.y + offset;
         padded_cube_triangle_list[i][2][2] = CURSOR_PADDING * tmp[i].p3.z + offset;
+
+        std::cout<<"[ ";
+        std::cout<< "(" << tmp[i].p1.x << " " << tmp[i].p1.y << " " << tmp[i].p1.z << ") ";
+        std::cout<< "(" << tmp[i].p2.x << " " << tmp[i].p2.y << " " << tmp[i].p2.z << ") ";
+        std::cout<< "(" << tmp[i].p3.x << " " << tmp[i].p3.y << " " << tmp[i].p3.z << ") ";
+        std::cout<<"]\n";
+        std::cout<<"[ ";
+        std::cout<< "(" << CURSOR_PADDING * tmp[i].p1.x + offset << " " << CURSOR_PADDING * tmp[i].p1.y + offset << " " << CURSOR_PADDING * tmp[i].p1.z + offset << ") ";
+        std::cout<< "(" << CURSOR_PADDING * tmp[i].p2.x + offset << " " << CURSOR_PADDING * tmp[i].p2.y + offset << " " << CURSOR_PADDING * tmp[i].p2.z + offset << ") ";
+        std::cout<< "(" << CURSOR_PADDING * tmp[i].p3.x + offset << " " << CURSOR_PADDING * tmp[i].p3.y + offset << " " << CURSOR_PADDING * tmp[i].p3.z + offset << ") ";
+        std::cout<<"]\n";
+        std::cout<<"--------------\n";
   }
   /*
   for(int i = 0; i < 12; i++) {
