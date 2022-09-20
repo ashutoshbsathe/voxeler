@@ -487,6 +487,17 @@ void updateCursor() {
     }
 }
 
+void saveModelToFile(std::string fname) {
+    std::ofstream out;
+    out.open(fname);
+    out << "N_CELLS = " << N_CELLS << "\n";
+    for(auto it : model) {
+        out << "(" << it.first.x << "," << it.first.y << "," << it.first.z << ")->";
+        out << "(" << it.second.x << "," << it.second.y << "," << it.second.z << ")\n";
+    }
+    out.close();
+}
+
 void gridInitShadersGL(void)
 {
   std::string vertex_shader_file("grid_vs.glsl");

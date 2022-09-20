@@ -3,6 +3,7 @@
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 extern bool persp;
 extern void insertAtCursor(), deleteAtCursor(), updateCursor();
+extern void saveModelToFile(std::string);
 extern float color_r, color_g, color_b;
 extern Point current_color;
 namespace csX75
@@ -119,6 +120,13 @@ namespace csX75
 		std::cout<<"Cursor color changed successfully.\n";
 		Point updateColor(color_r, color_g, color_b);
 		current_color = updateColor;
+	}
+	else if(key == GLFW_KEY_G && action == GLFW_PRESS){
+        std::string fname;
+        std::cout << "Enter filename:";
+        std::cin >> fname;
+        saveModelToFile(fname);
+        std::cout << "Done!\n";
 	}
   }
 };  
