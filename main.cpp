@@ -4,7 +4,8 @@
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
 float grid_offsets[N_CELLS+2];
 float cube_coords[36*3];
-float cube_colors[36*3] = {
+// TODO: rename cube to cursor
+float default_cube_colors[36*3] = {
     // green
     0/255.0, 255/255.0, 0/255.0,
     0/255.0, 255/255.0, 0/255.0,
@@ -58,7 +59,7 @@ float cube_colors[36*3] = {
     255/255.0, 0/255.0, 255/255.0,
     255/255.0, 0/255.0, 255/255.0,
     255/255.0, 0/255.0, 255/255.0,
-};
+}, padded_cube_colors[36*3], *cube_colors = default_cube_colors;
 bool compare_vec3(glm::vec3 v1, glm::vec3 v2) {
     if(v1.x == v2.x) {
         if(v1.y == v2.y) {
@@ -103,10 +104,10 @@ float *model_triangle_list;
 //std::vector<glm::vec3> model_triangle_colors; // TODO: allocate an array on heap instead
 #define MODEL_COLORS(i, j, k) (model_triangle_colors[3*3*i + 3*j + k])
 float *model_triangle_colors;
-bool update_vbo = false;
+bool update_model_vbo = false, update_cursor_vbo = false;
 unsigned long num_triangles = 0, max_num_triangles = 6 * N_CELLS * N_CELLS * 2;
 
-float cube_triangle_list[12][3][3]; // 12 tri, 3 pt/tri, 3 coords/pt
+float default_cube_triangle_list[12][3][3], padded_cube_triangle_list[12][3][3], *cube_triangle_list = (float *)default_cube_triangle_list; // 12 tri, 3 pt/tri, 3 coords/pt
 std::vector<glm::vec3> cube_triangle_colors;
 
 GLuint grid_shader_program, cursor_shader_program, model_shader_program;
@@ -457,13 +458,32 @@ void insertAtCursor() {
         deleteAt(cursor_x, cursor_y, cursor_z);
         insertAt(cursor_x, cursor_y, cursor_z, current_color);
     }
-    update_vbo = true;
+    update_model_vbo = true;
 }
 
 void deleteAtCursor() {
     if(model.find(Point(cursor_x, cursor_y, cursor_z)) != model.end()) {
         deleteAt(cursor_x, cursor_y, cursor_z);
-        update_vbo = true;
+        update_model_vbo = true;
+    }
+}
+
+void updateCursor() {
+    if(model.find(Point(cursor_x, cursor_y, cursor_z)) != model.end()) {
+        Point color = model[Point(cursor_x, cursor_y, cursor_z)];
+        for(int i = 0; i < 36; i++) {
+            padded_cube_colors[3*i] = color.x;
+            padded_cube_colors[3*i+1] = color.y;
+            padded_cube_colors[3*i+2] = color.z;
+        }
+        cube_triangle_list = (float *)padded_cube_triangle_list;
+        cube_colors = padded_cube_colors;
+        update_cursor_vbo = true;
+    }
+    else {
+        cube_triangle_list = (float *)default_cube_triangle_list;
+        cube_colors = default_cube_colors;
+        update_cursor_vbo = true;
     }
 }
 
@@ -619,6 +639,14 @@ void renderGL(void)
   // Draw the cursor cube
   glUseProgram(cursor_shader_program);
   glBindVertexArray(cursor_vao);
+  if(update_cursor_vbo) {
+      glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cube_triangle_list);
+      glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 36 * 3 * sizeof(float), cube_colors);
+      std::cout << "Drawing cursor with color: " << cube_colors[0] << ", " << cube_colors[1] << ", " << cube_colors[2] << "\n";
+      std::cout << "First point: " << cube_triangle_list[0] << ", " << cube_triangle_list[1] << ", " << cube_triangle_list[2] << "\n";
+      update_cursor_vbo = false;
+  }
   glUniform3f(cursor_offset_id, cursor_x, cursor_y, cursor_z);
   glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -626,11 +654,11 @@ void renderGL(void)
   // Finally draw the model
   glUseProgram(model_shader_program);
   glBindVertexArray(model_vao);
-  if(update_vbo) {
+  if(update_model_vbo) {
       glBindBuffer (GL_ARRAY_BUFFER, model_vbo);
       glBufferSubData(GL_ARRAY_BUFFER, 0, max_num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
       glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), max_num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
-      update_vbo = false;
+      update_model_vbo = false;
       std::cout << "num_triangles = " << num_triangles << "\n";
   }
   glUniformMatrix4fv(model_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
@@ -710,15 +738,26 @@ int main(int argc, char** argv)
   // since model is empty it should return all triangles
   auto tmp = trianglesAt(Point(0, 0, 0), current_color).first;
   for(int i = 0; i < tmp.size(); i++) {
-        cube_triangle_list[i][0][0] = tmp[i].p1.x;
-        cube_triangle_list[i][0][1] = tmp[i].p1.y;
-        cube_triangle_list[i][0][2] = tmp[i].p1.z;
-        cube_triangle_list[i][1][0] = tmp[i].p2.x;
-        cube_triangle_list[i][1][1] = tmp[i].p2.y;
-        cube_triangle_list[i][1][2] = tmp[i].p2.z;
-        cube_triangle_list[i][2][0] = tmp[i].p3.x;
-        cube_triangle_list[i][2][1] = tmp[i].p3.y;
-        cube_triangle_list[i][2][2] = tmp[i].p3.z;
+        default_cube_triangle_list[i][0][0] = tmp[i].p1.x;
+        default_cube_triangle_list[i][0][1] = tmp[i].p1.y;
+        default_cube_triangle_list[i][0][2] = tmp[i].p1.z;
+        default_cube_triangle_list[i][1][0] = tmp[i].p2.x;
+        default_cube_triangle_list[i][1][1] = tmp[i].p2.y;
+        default_cube_triangle_list[i][1][2] = tmp[i].p2.z;
+        default_cube_triangle_list[i][2][0] = tmp[i].p3.x;
+        default_cube_triangle_list[i][2][1] = tmp[i].p3.y;
+        default_cube_triangle_list[i][2][2] = tmp[i].p3.z;
+
+        float offset = N_UNITS / 2 - CURSOR_PADDING * N_UNITS / 2;
+        padded_cube_triangle_list[i][0][0] = CURSOR_PADDING * tmp[i].p1.x + offset;
+        padded_cube_triangle_list[i][0][1] = CURSOR_PADDING * tmp[i].p1.y + offset;
+        padded_cube_triangle_list[i][0][2] = CURSOR_PADDING * tmp[i].p1.z + offset;
+        padded_cube_triangle_list[i][1][0] = CURSOR_PADDING * tmp[i].p2.x + offset;
+        padded_cube_triangle_list[i][1][1] = CURSOR_PADDING * tmp[i].p2.y + offset;
+        padded_cube_triangle_list[i][1][2] = CURSOR_PADDING * tmp[i].p2.z + offset;
+        padded_cube_triangle_list[i][2][0] = CURSOR_PADDING * tmp[i].p3.x + offset;
+        padded_cube_triangle_list[i][2][1] = CURSOR_PADDING * tmp[i].p3.y + offset;
+        padded_cube_triangle_list[i][2][2] = CURSOR_PADDING * tmp[i].p3.z + offset;
   }
   /*
   for(int i = 0; i < 12; i++) {

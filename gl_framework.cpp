@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
 extern bool persp;
-extern void insertAtCursor(), deleteAtCursor();
+extern void insertAtCursor(), deleteAtCursor(), updateCursor();
 extern float color_r, color_g, color_b;
 extern Point current_color;
 namespace csX75
@@ -62,31 +62,37 @@ namespace csX75
     else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
         if(cursor_x < cursor_max - moveamount) {
             cursor_x += moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
         if(cursor_x > cursor_min) {
             cursor_x -= moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_D && action == GLFW_PRESS) {
         if(cursor_y < cursor_max - moveamount) {
             cursor_y += moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_A && action == GLFW_PRESS) {
         if(cursor_y > cursor_min) {
             cursor_y -= moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_E && action == GLFW_PRESS) {
         if(cursor_z < cursor_max - moveamount) {
             cursor_z += moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
         if(cursor_z > cursor_min) {
             cursor_z -= moveamount;
+            updateCursor();
         }
     }
     else if(key == GLFW_KEY_V && action == GLFW_PRESS) {
