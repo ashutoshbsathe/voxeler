@@ -459,12 +459,14 @@ void insertAtCursor() {
         insertAt(cursor_x, cursor_y, cursor_z, current_color);
     }
     update_model_vbo = true;
+    updateCursor();
 }
 
 void deleteAtCursor() {
     if(model.find(Point(cursor_x, cursor_y, cursor_z)) != model.end()) {
         deleteAt(cursor_x, cursor_y, cursor_z);
         update_model_vbo = true;
+        updateCursor();
     }
 }
 
@@ -498,7 +500,7 @@ void saveModelToFile(std::string fname) {
     out.open(fname);
     out << N_CELLS << "\n";
     for(auto it : model) {
-        out << it.first.x << " " << it.first.y << " " << it.first.z << " ";
+        out << it.first.x - DRAW_MIN << " " << it.first.y - DRAW_MIN << " " << it.first.z - DRAW_MIN << " ";
         out << it.second.x << " " << it.second.y << " " << it.second.z << "\n";
     }
     out.close();
@@ -522,6 +524,9 @@ void readModelFromFile(std::string fname) {
             while(getline(in, line)) {
                 ss << line;
                 ss >> x >> y >> z >> r >> g >> b;
+                x += DRAW_MIN;
+                y += DRAW_MIN;
+                z += DRAW_MIN;
                 if(
                         (x > cursor_min && x < cursor_max - moveamount) &&
                         (y > cursor_min && x < cursor_max - moveamount) &&
@@ -534,6 +539,7 @@ void readModelFromFile(std::string fname) {
                     color_g = g;
                     color_b = b;
                     current_color = Point(color_r, color_g, color_b);
+                    std::cout << "Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
                     insertAtCursor();
                 }
                 ss.clear();
