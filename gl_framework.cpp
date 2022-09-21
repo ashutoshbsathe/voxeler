@@ -123,7 +123,7 @@ namespace csX75
 	}
 	else if(key == GLFW_KEY_G && action == GLFW_PRESS){
         std::string fname;
-        std::cout << "Enter filename:";
+        std::cout << "Enter filename to save the model:";
         std::cin >> fname;
         saveModelToFile(fname);
         std::cout << "Done!\n";
@@ -134,7 +134,7 @@ namespace csX75
 	else if(key == GLFW_KEY_K && action == GLFW_PRESS){ 
         resetModel();
         std::string fname;
-        std::cout << "Enter filename:";
+        std::cout << "Enter filename to load the model from:";
         std::cin >> fname;
         readModelFromFile(fname);
         std::cout << "Done!\n";

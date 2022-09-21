@@ -257,12 +257,15 @@ void deleteAt(float x, float y, float z) {
 void saveModelToFile(std::string fname) {
     std::ofstream out;
     out.open(fname);
+    auto t_start = std::chrono::high_resolution_clock::now();
     out << max_num_cubes << "\n";
     for(auto it : model) {
         out << it.first.x - cursor_min << " " << it.first.y - cursor_min << " " << it.first.z - cursor_min << " ";
         out << it.second.x << " " << it.second.y << " " << it.second.z << "\n";
     }
     out.close();
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::cout << "Model saved in " << std::chrono::duration<double, std::milli>(t_end-t_start).count() << "ms\n";
 }
 
 void readModelFromFile(std::string fname) {
@@ -280,6 +283,7 @@ void readModelFromFile(std::string fname) {
             if(n > max_num_cubes) {
                 std::cout << "Loading model larger than current grid size (" << max_num_cubes << "), will ignore everything outside current bounds.\n";
             }
+            auto t_start = std::chrono::high_resolution_clock::now();
             while(getline(in, line)) {
                 ss << line;
                 ss >> x >> y >> z >> r >> g >> b;
@@ -298,7 +302,9 @@ void readModelFromFile(std::string fname) {
                     cursor_g = g;
                     cursor_b = b;
                     cursor_color = Point(cursor_r, cursor_g, cursor_b);
-                    std::cout << "Read " << ++count << " blocks. Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
+                    if(DEBUG_MODEL) {
+                        std::cout << "Read " << ++count << " blocks. Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
+                    }
                     model[Point(cursor_x, cursor_y, cursor_z)] = cursor_color;
                 }
                 ss.clear();
@@ -336,6 +342,8 @@ void readModelFromFile(std::string fname) {
                 idx++;
             }
             num_triangles = tris.size();
+            auto t_end = std::chrono::high_resolution_clock::now();
+            std::cout << "Model loaded in " << std::chrono::duration<double, std::milli>(t_end-t_start).count() << "ms\n";
         }
         catch(std::exception const &e) {
             std::cout << "error : " << e.what() << "\n";
