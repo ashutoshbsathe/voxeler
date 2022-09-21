@@ -3,61 +3,7 @@
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
 float grid_offsets[N_CELLS+2];
 
-float default_cursor_colors[36*3] = {
-    // green
-    0/255.0, 255/255.0, 0/255.0,
-    0/255.0, 255/255.0, 0/255.0,
-    0/255.0, 255/255.0, 0/255.0,
-
-    0/255.0, 255/255.0, 0/255.0,
-    0/255.0, 255/255.0, 0/255.0,
-    0/255.0, 255/255.0, 0/255.0,
-
-    // blue
-    0/255.0, 0/255.0, 255/255.0,
-    0/255.0, 0/255.0, 255/255.0,
-    0/255.0, 0/255.0, 255/255.0,
-
-    0/255.0, 0/255.0, 255/255.0,
-    0/255.0, 0/255.0, 255/255.0,
-    0/255.0, 0/255.0, 255/255.0,
-
-    // yellow
-    255/255.0, 255/255.0, 0/255.0,
-    255/255.0, 255/255.0, 0/255.0,
-    255/255.0, 255/255.0, 0/255.0,
-
-    255/255.0, 255/255.0, 0/255.0,
-    255/255.0, 255/255.0, 0/255.0,
-    255/255.0, 255/255.0, 0/255.0,
-
-    // white
-    255/255.0, 255/255.0, 255/255.0,
-    255/255.0, 255/255.0, 255/255.0,
-    255/255.0, 255/255.0, 255/255.0,
-
-    255/255.0, 255/255.0, 255/255.0,
-    255/255.0, 255/255.0, 255/255.0,
-    255/255.0, 255/255.0, 255/255.0,
-
-    // red
-    255/255.0, 0/255.0, 0/255.0,
-    255/255.0, 0/255.0, 0/255.0,
-    255/255.0, 0/255.0, 0/255.0,
-
-    255/255.0, 0/255.0, 0/255.0,
-    255/255.0, 0/255.0, 0/255.0,
-    255/255.0, 0/255.0, 0/255.0,
-
-    // magenta
-    255/255.0, 0/255.0, 255/255.0,
-    255/255.0, 0/255.0, 255/255.0,
-    255/255.0, 0/255.0, 255/255.0,
-
-    255/255.0, 0/255.0, 255/255.0,
-    255/255.0, 0/255.0, 255/255.0,
-    255/255.0, 0/255.0, 255/255.0,
-}, padded_cursor_colors[36*3], *cursor_colors = default_cursor_colors;
+float default_cursor_colors[36*3], padded_cursor_colors[36*3], *cursor_colors = default_cursor_colors;
 bool update_model_vbo = false, update_cursor_vbo = false;
 
 float default_cursor_triangle_list[12][3][3], padded_cursor_triangle_list[12][3][3], *cursor_triangle_list = (float *)default_cursor_triangle_list; // 12 tri, 3 pt/tri, 3 coords/pt
@@ -280,15 +226,7 @@ void renderGL(void)
   }
   else 
 	modelviewproject_matrix = ortho_matrix * view_matrix * rotation_matrix;
-
-  // Drawing the grid first
-  
-  glUseProgram(grid_shader_program);
-  glBindVertexArray(grid_vao);
-  glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
-  glUniformMatrix4fv(grid_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
-  glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
-  
+ 
   // Draw the cursor cube
   glUseProgram(cursor_shader_program);
   glBindVertexArray(cursor_vao);
@@ -304,7 +242,7 @@ void renderGL(void)
   glUniformMatrix4fv(cursor_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glDrawArrays(GL_TRIANGLES, 0, 36);
 
-  // Finally draw the model
+  // Draw the model
   glUseProgram(model_shader_program);
   glBindVertexArray(model_vao);
   if(update_model_vbo) {
@@ -316,6 +254,15 @@ void renderGL(void)
   }
   glUniformMatrix4fv(model_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
   glDrawArrays(GL_TRIANGLES, 0, num_triangles * 3);
+  
+  if(draw_grid) {
+      // Drawing the grid last since it has transparency
+      glUseProgram(grid_shader_program);
+      glBindVertexArray(grid_vao);
+      glUniform1fv(grid_offset_id, N_CELLS + 2, grid_offsets);
+      glUniformMatrix4fv(grid_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
+      glDrawArraysInstanced(GL_LINES, 0, 2*(N_CELLS+1), 3*(N_CELLS+1));
+  }
 }
 
 int main(int argc, char** argv)
@@ -376,7 +323,9 @@ int main(int argc, char** argv)
 
   //Initialize GL state
   csX75::initGL();
-
+  glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//glBlendEquation(GL_SUBTRACT);
   model.clear();
 
   model_triangle_list = (float *)calloc(max_num_triangles * 3 * 3, sizeof(float));
@@ -425,6 +374,11 @@ int main(int argc, char** argv)
         std::cout<< "(" << CURSOR_PADDING * tmp[i].p3.x + offset << " " << CURSOR_PADDING * tmp[i].p3.y + offset << " " << CURSOR_PADDING * tmp[i].p3.z + offset << ") ";
         std::cout<<"]\n";
         std::cout<<"--------------\n";
+  }
+  for(int i = 0; i < 36; i++) {
+      default_cursor_colors[3*i] = 0;
+      default_cursor_colors[3*i+1] = 1;
+      default_cursor_colors[3*i+2] = 0;
   }
   /*
   for(int i = 0; i < 12; i++) {

@@ -1,7 +1,7 @@
 #include "gl_framework.hpp"
 #include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
-extern bool persp;
+extern bool persp, draw_grid;
 extern void insertAtCursor(), deleteAtCursor(), updateCursor(), resetModel();
 extern void saveModelToFile(std::string), readModelFromFile(std::string);
 extern float cursor_r, cursor_g, cursor_b;
@@ -139,6 +139,9 @@ namespace csX75
         readModelFromFile(fname);
         std::cout << "Done!\n";
 	}
+    else if(key == GLFW_KEY_T && action == GLFW_PRESS) {
+        draw_grid = !draw_grid;
+    }
   }
 };  
   

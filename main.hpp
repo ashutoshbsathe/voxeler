@@ -13,6 +13,7 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 #include "glm/mat4x4.hpp"
+#include "glm/gtc/constants.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -27,8 +28,8 @@
 #define DRAW_MIN (-(N_CELLS*N_UNITS)/2)
 #define DRAW_MAX ((N_CELLS*N_UNITS)/2)
 
-bool persp = false;
-float xrot = 0, yrot = 0, zrot = 0, rotamount = 0.1;
+bool persp = false, draw_grid = true;
+float xrot = 0, yrot = 0, zrot = 0, rotamount = glm::pi<float>() / 12; // 15 degrees
 
 float cursor_x = 0, cursor_y = 0, cursor_z = 0, moveamount = N_UNITS, cursor_max = DRAW_MAX, cursor_min = DRAW_MIN;
 float cursor_r = 1.0, cursor_g = 1.0, cursor_b = 0.0;
