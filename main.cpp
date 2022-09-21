@@ -84,6 +84,7 @@ void resetModel() {
     num_triangles = 0;
     model.clear();
     update_model_vbo = true;
+    updateCursor();
 }
 
 void gridInitShadersGL(void)

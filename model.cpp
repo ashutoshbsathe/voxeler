@@ -274,7 +274,7 @@ void readModelFromFile(std::string fname) {
     std::stringstream ss;
     std::unordered_set<Triangle, Triangle::HashTriangle> tris;
     in.open(fname);
-    unsigned int n, count = 0, idx = 0;
+    unsigned int n, count = 0, idx = 0, ignored = 0;
     float x, y, z, r, g, b;
     if(in.is_open()) {
         try {
@@ -291,9 +291,9 @@ void readModelFromFile(std::string fname) {
                 y += cursor_min;
                 z += cursor_min;
                 if(
-                        (x > cursor_min && x < cursor_max - moveamount) &&
-                        (y > cursor_min && x < cursor_max - moveamount) &&
-                        (z > cursor_min && x < cursor_max - moveamount)
+                        (x >= cursor_min && x <= cursor_max - moveamount) &&
+                        (y >= cursor_min && x <= cursor_max - moveamount) &&
+                        (z >= cursor_min && x <= cursor_max - moveamount)
                 ) {
                     cursor_x = x;
                     cursor_y = y;
@@ -306,6 +306,9 @@ void readModelFromFile(std::string fname) {
                         std::cout << "Read " << ++count << " blocks. Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
                     }
                     model[Point(cursor_x, cursor_y, cursor_z)] = cursor_color;
+                }
+                else {
+                    std::cout << "Ignoring cube (" << x - cursor_min << ", " << y - cursor_min << ", " << z - cursor_min << "), total ignored = " << ++ignored << "\n";
                 }
                 ss.clear();
             }
