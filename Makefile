@@ -3,10 +3,10 @@ GLEWLIB= -lGLEW
 GLFWLIB = -lglfw
 LIBS=$(OPENGLLIB) $(GLEWLIB) $(GLFWLIB)
 LDFLAGS=-L/usr/local/lib 
-CPPFLAGS=-I/usr/local/include
+CPPFLAGS=-I/usr/local/include -std=c++11
 
 BIN=a1model
-SRCS=point.cpp triangle.cpp main.cpp gl_framework.cpp shader_util.cpp
+SRCS=point.cpp triangle.cpp model.cpp main.cpp gl_framework.cpp shader_util.cpp
 INCLUDES=gl_framework.hpp shader_util.hpp point.hpp triangle.hpp
 
 all: $(BIN)

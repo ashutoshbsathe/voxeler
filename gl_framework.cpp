@@ -132,6 +132,7 @@ namespace csX75
         resetModel();
 	}
 	else if(key == GLFW_KEY_K && action == GLFW_PRESS){ 
+        resetModel();
         std::string fname;
         std::cout << "Enter filename:";
         std::cin >> fname;
