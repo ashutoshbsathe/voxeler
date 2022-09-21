@@ -144,11 +144,11 @@ void defineGrid() {
 }
 void insertAtCursor() {
     if(model.find(Point(cursor_x, cursor_y, cursor_z)) == model.end()) {        
-        insertAt(cursor_x, cursor_y, cursor_z, current_color);
+        insertAt(cursor_x, cursor_y, cursor_z, cursor_color);
     }
     else {
         deleteAt(cursor_x, cursor_y, cursor_z);
-        insertAt(cursor_x, cursor_y, cursor_z, current_color);
+        insertAt(cursor_x, cursor_y, cursor_z, cursor_color);
     }
     update_model_vbo = true;
     updateCursor();
@@ -436,7 +436,7 @@ int main(int argc, char** argv)
   //cube_triangle_colors.clear();
   
   // since model is empty it should return all triangles
-  auto tmp = trianglesAt(Point(0, 0, 0), current_color).first;
+  auto tmp = trianglesAt(Point(0, 0, 0), cursor_color).first;
   for(int i = 0; i < tmp.size(); i++) {
         default_cube_triangle_list[i][0][0] = tmp[i].p1.x;
         default_cube_triangle_list[i][0][1] = tmp[i].p1.y;
@@ -501,15 +501,15 @@ int main(int argc, char** argv)
   /*
   printModel();
   printTriangleList();
-  insertAt(0, 0, 0, current_color);
+  insertAt(0, 0, 0, cursor_color);
   
   printModel();
   printTriangleList();
-  insertAt(0, 0, N_UNITS, current_color);
+  insertAt(0, 0, N_UNITS, cursor_color);
   
   printModel();
   printTriangleList();
-  insertAt(N_UNITS, 0, 0, current_color);
+  insertAt(N_UNITS, 0, 0, cursor_color);
   
   printModel();
   printTriangleList();

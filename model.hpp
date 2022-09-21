@@ -20,8 +20,8 @@ extern float *model_triangle_colors;
 extern unsigned long num_triangles;
 
 extern unsigned long max_num_triangles, max_num_cubes;
-extern float moveamount, cursor_min, cursor_max, cursor_x, cursor_y, cursor_z, color_r, color_g, color_b;
-extern Point current_color;
+extern float moveamount, cursor_min, cursor_max, cursor_x, cursor_y, cursor_z, cursor_r, cursor_g, cursor_b;
+extern Point cursor_color;
 extern void insertAtCursor();
 
 void printTriangleList(); 

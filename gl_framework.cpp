@@ -4,8 +4,8 @@ extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveam
 extern bool persp;
 extern void insertAtCursor(), deleteAtCursor(), updateCursor(), resetModel();
 extern void saveModelToFile(std::string), readModelFromFile(std::string);
-extern float color_r, color_g, color_b;
-extern Point current_color;
+extern float cursor_r, cursor_g, cursor_b;
+extern Point cursor_color;
 namespace csX75
 {
   //! Initialize GL State
@@ -109,17 +109,17 @@ namespace csX75
         deleteAtCursor();
     }
 	else if(key == GLFW_KEY_C && action == GLFW_PRESS){
-		float color_r, color_g, color_b;
+		float cursor_r, cursor_g, cursor_b;
 		std::cout<<"Changing the cursor color:\n";
 		std::cout<<"Enter 'r' component:";
-		std::cin>>color_r;
+		std::cin>>cursor_r;
 		std::cout<<"Enter 'g' component:";
-		std::cin>>color_g;
+		std::cin>>cursor_g;
 		std::cout<<"Enter 'b' component:";
-		std::cin>>color_b;
+		std::cin>>cursor_b;
+		Point updated_color(cursor_r, cursor_g, cursor_b);
+		cursor_color = updated_color;
 		std::cout<<"Cursor color changed successfully.\n";
-		Point updateColor(color_r, color_g, color_b);
-		current_color = updateColor;
 	}
 	else if(key == GLFW_KEY_G && action == GLFW_PRESS){
         std::string fname;

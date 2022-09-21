@@ -293,10 +293,10 @@ void readModelFromFile(std::string fname) {
                     cursor_x = x;
                     cursor_y = y;
                     cursor_z = z;
-                    color_r = r;
-                    color_g = g;
-                    color_b = b;
-                    current_color = Point(color_r, color_g, color_b);
+                    cursor_r = r;
+                    cursor_g = g;
+                    cursor_b = b;
+                    cursor_color = Point(cursor_r, cursor_g, cursor_b);
                     std::cout << "Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
                     insertAtCursor();
                 }
