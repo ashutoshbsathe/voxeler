@@ -75,13 +75,13 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
 	/*
 	 * While checking, if we found a triangle already at some position, then delete that triangle along with the found color of the traingle from the model.
 	 * i.e: if(model.find(c+Point(0, -moveamount, 0) != model.end()))
-	 * => then deleteList.push_back(bottom_1.changeColor(model(c+Point(0,-moveamount,0)))), and do the same for the other triangle.
+	 * => then deleteList.push_back(bottom_1.withColor(model(c+Point(0,-moveamount,0)))), and do the same for the other triangle.
 	 */
 
     // Bottom face
     if(model.find(c + Point(0, -moveamount, 0)) != model.end()) {
-        deleteList.push_back(bottom_1.changeColor(model[c + Point(0, -moveamount, 0)]));
-        deleteList.push_back(bottom_2.changeColor(model[c + Point(0, -moveamount, 0)]));
+        deleteList.push_back(bottom_1.withColor(model[c + Point(0, -moveamount, 0)]));
+        deleteList.push_back(bottom_2.withColor(model[c + Point(0, -moveamount, 0)]));
     }
     else {
         drawList.push_back(bottom_1);
@@ -89,8 +89,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
     }
     // Top face
     if(model.find(c + Point(0, moveamount, 0)) != model.end()) {
-        deleteList.push_back(top_1.changeColor(model[c + Point(0, moveamount, 0)]));
-        deleteList.push_back(top_2.changeColor(model[c + Point(0, moveamount, 0)]));
+        deleteList.push_back(top_1.withColor(model[c + Point(0, moveamount, 0)]));
+        deleteList.push_back(top_2.withColor(model[c + Point(0, moveamount, 0)]));
     }
     else {
         drawList.push_back(top_1);
@@ -98,8 +98,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
     }
     // Right face
     if(model.find(c + Point(moveamount, 0, 0)) != model.end()) {
-        deleteList.push_back(right_1.changeColor(model[c + Point(moveamount, 0, 0)]));
-        deleteList.push_back(right_2.changeColor(model[c + Point(moveamount, 0, 0)]));
+        deleteList.push_back(right_1.withColor(model[c + Point(moveamount, 0, 0)]));
+        deleteList.push_back(right_2.withColor(model[c + Point(moveamount, 0, 0)]));
     }
     else {
         drawList.push_back(right_1);
@@ -107,8 +107,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
     }
     // Left face
     if(model.find(c + Point(-moveamount, 0, 0)) != model.end()) {
-        deleteList.push_back(left_1.changeColor(model[c + Point(-moveamount, 0, 0)]));
-        deleteList.push_back(left_2.changeColor(model[c + Point(-moveamount, 0, 0)]));
+        deleteList.push_back(left_1.withColor(model[c + Point(-moveamount, 0, 0)]));
+        deleteList.push_back(left_2.withColor(model[c + Point(-moveamount, 0, 0)]));
     }
     else {
         drawList.push_back(left_1);
@@ -116,8 +116,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
     }
     // Front face
     if(model.find(c + Point(0, 0, moveamount)) != model.end()) {
-        deleteList.push_back(front_1.changeColor(model[c + Point(0, 0, moveamount)]));
-        deleteList.push_back(front_2.changeColor(model[c + Point(0, 0, moveamount)]));
+        deleteList.push_back(front_1.withColor(model[c + Point(0, 0, moveamount)]));
+        deleteList.push_back(front_2.withColor(model[c + Point(0, 0, moveamount)]));
     }
     else {
         drawList.push_back(front_1);
@@ -125,8 +125,8 @@ std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Poi
     }
     // Back face
     if(model.find(c + Point(0, 0, -moveamount)) != model.end()) {
-        deleteList.push_back(back_1.changeColor(model[c + Point(0, 0, -moveamount)]));
-        deleteList.push_back(back_2.changeColor(model[c + Point(0, 0, -moveamount)]));
+        deleteList.push_back(back_1.withColor(model[c + Point(0, 0, -moveamount)]));
+        deleteList.push_back(back_2.withColor(model[c + Point(0, 0, -moveamount)]));
     }
     else {
         drawList.push_back(back_1);

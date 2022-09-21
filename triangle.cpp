@@ -21,6 +21,6 @@ bool Triangle::operator<(const struct Triangle &t) const {
 bool Triangle::operator==(const struct Triangle &t) const {
     return this->p1 == t.p1 && this->p2 == t.p2 && this->p3 == t.p3;
 }
-Triangle Triangle::changeColor(Point color){
+Triangle Triangle::withColor(Point color){
 	return Triangle(this->p1, this->p2, this->p3, color);
 }
