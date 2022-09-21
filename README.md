@@ -7,3 +7,6 @@
 
 # Code formatting 
 Artistic Style -- https://stackoverflow.com/questions/1813897/is-there-a-utility-to-indent-c-programs
+
+# Models
+* Mandelbulb -- https://www.youtube.com/watch?v=-h41T4x3QkY
