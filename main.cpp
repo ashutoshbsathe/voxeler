@@ -724,8 +724,8 @@ void renderGL(void)
   glBindVertexArray(model_vao);
   if(update_model_vbo) {
       glBindBuffer (GL_ARRAY_BUFFER, model_vbo);
-      glBufferSubData(GL_ARRAY_BUFFER, 0, max_num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
-      glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), max_num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
+      glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
       update_model_vbo = false;
       std::cout << "num_triangles = " << num_triangles << "\n";
   }
