@@ -269,8 +269,9 @@ void readModelFromFile(std::string fname) {
     std::ifstream in;
     std::string line;
     std::stringstream ss;
+    std::unordered_set<Triangle, Triangle::HashTriangle> tris;
     in.open(fname);
-    unsigned int n;
+    unsigned int n, count = 0, idx = 0;
     float x, y, z, r, g, b;
     if(in.is_open()) {
         try {
@@ -297,11 +298,44 @@ void readModelFromFile(std::string fname) {
                     cursor_g = g;
                     cursor_b = b;
                     cursor_color = Point(cursor_r, cursor_g, cursor_b);
-                    std::cout << "Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
-                    insertAtCursor();
+                    std::cout << "Read " << ++count << " blocks. Inserting at (" << cursor_x << ", " << cursor_y << ", " << cursor_z << ")\n";
+                    model[Point(cursor_x, cursor_y, cursor_z)] = cursor_color;
                 }
                 ss.clear();
             }
+            for(auto it : model) {
+                auto tri_pair = trianglesAt(it.first, it.second);
+                for(auto t_add : tri_pair.first) {
+                    tris.insert(t_add);
+                }
+                for(auto t_remove : tri_pair.second) {
+                    tris.erase(t_remove);
+                }
+            }
+            for(auto tri : tris) {
+                MODEL_TRIANGLES(idx, 0, 0) = tri.p1.x;
+                MODEL_TRIANGLES(idx, 0, 1) = tri.p1.y;
+                MODEL_TRIANGLES(idx, 0, 2) = tri.p1.z;
+                MODEL_TRIANGLES(idx, 1, 0) = tri.p2.x;
+                MODEL_TRIANGLES(idx, 1, 1) = tri.p2.y;
+                MODEL_TRIANGLES(idx, 1, 2) = tri.p2.z;
+                MODEL_TRIANGLES(idx, 2, 0) = tri.p3.x;
+                MODEL_TRIANGLES(idx, 2, 1) = tri.p3.y;
+                MODEL_TRIANGLES(idx, 2, 2) = tri.p3.z;
+
+                MODEL_COLORS(idx, 0, 0) = tri.c.x;
+                MODEL_COLORS(idx, 0, 1) = tri.c.y;
+                MODEL_COLORS(idx, 0, 2) = tri.c.z;
+                MODEL_COLORS(idx, 1, 0) = tri.c.x;
+                MODEL_COLORS(idx, 1, 1) = tri.c.y;
+                MODEL_COLORS(idx, 1, 2) = tri.c.z;
+                MODEL_COLORS(idx, 2, 0) = tri.c.x;
+                MODEL_COLORS(idx, 2, 1) = tri.c.y;
+                MODEL_COLORS(idx, 2, 2) = tri.c.z;
+
+                idx++;
+            }
+            num_triangles = tris.size();
         }
         catch(std::exception const &e) {
             std::cout << "error : " << e.what() << "\n";
