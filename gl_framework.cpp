@@ -1,7 +1,7 @@
 #include "gl_framework.hpp"
 #include <GLFW/glfw3.h>
 extern GLfloat xrot, yrot, zrot, rotamount, cursor_x, cursor_y, cursor_z, moveamount, cursor_max, cursor_min;
-extern bool persp, draw_grid;
+extern bool persp, draw_grid, isInspectMode;
 extern void insertAtCursor(), deleteAtCursor(), updateCursor(), resetModel();
 extern void saveModelToFile(std::string), readModelFromFile(std::string);
 extern float cursor_r, cursor_g, cursor_b;
@@ -60,77 +60,95 @@ namespace csX75
     else if(key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS) {
         zrot += rotamount;
     }
-    else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
-        if(cursor_x < cursor_max - moveamount) {
-            cursor_x += moveamount;
-            updateCursor();
-        }
+	// move cursor on x axis
+    else if(key == GLFW_KEY_X && action == GLFW_PRESS) {
+		// move cursor rigt
+		if (mods == GLFW_MOD_SHIFT){
+			if(cursor_x < cursor_max - moveamount){
+				cursor_x += moveamount;
+				updateCursor();
+				}
+			}
+		// move cursor left
+		else{
+			if(cursor_x > cursor_min) {
+				cursor_x -= moveamount;
+				updateCursor();
+				}
+			}
     }
-    else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
-        if(cursor_x > cursor_min) {
-            cursor_x -= moveamount;
-            updateCursor();
-        }
+	// move cursor on y axis
+    else if(key == GLFW_KEY_Y && action == GLFW_PRESS) {
+		// move cursor up 
+		if (mods == GLFW_MOD_SHIFT){
+			if(cursor_y < cursor_max - moveamount) {
+				cursor_y += moveamount;
+				updateCursor();
+				}
+			}
+		// move cursor down 
+		else{
+			if(cursor_y > cursor_min) {
+				cursor_y -= moveamount;
+				updateCursor();
+				}
+			}
     }
-    else if(key == GLFW_KEY_D && action == GLFW_PRESS) {
-        if(cursor_y < cursor_max - moveamount) {
-            cursor_y += moveamount;
-            updateCursor();
-        }
+	// move cursor on z axis
+    else if(key == GLFW_KEY_Z && action == GLFW_PRESS) {
+		// move cursor forward
+		if (mods == GLFW_MOD_SHIFT){
+			if(cursor_z < cursor_max - moveamount) {
+				cursor_z += moveamount;
+				updateCursor();
+				}
+			}
+		// move cursor back 
+		else{
+			if(cursor_z > cursor_min) {
+				cursor_z -= moveamount;
+				updateCursor();
+				}
+			}
     }
-    else if(key == GLFW_KEY_A && action == GLFW_PRESS) {
-        if(cursor_y > cursor_min) {
-            cursor_y -= moveamount;
-            updateCursor();
-        }
-    }
-    else if(key == GLFW_KEY_E && action == GLFW_PRESS) {
-        if(cursor_z < cursor_max - moveamount) {
-            cursor_z += moveamount;
-            updateCursor();
-        }
-    }
-    else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {
-        if(cursor_z > cursor_min) {
-            cursor_z -= moveamount;
-            updateCursor();
-        }
-    }
-    else if(key == GLFW_KEY_V && action == GLFW_PRESS) {
+	// changing projection of the view
+	else if(key == GLFW_KEY_V && action == GLFW_PRESS) {
 		if(persp)
 			persp = false;
 		else
 			persp = true;
     }
+	// inserting a new cube at cursor
     else if(key == GLFW_KEY_P && action == GLFW_PRESS) {
         insertAtCursor();
     }
-    else if(key == GLFW_KEY_X && action == GLFW_PRESS) {
+	// deleting a already existing cube from cursor position
+    else if(key == GLFW_KEY_D && action == GLFW_PRESS) {
         deleteAtCursor();
     }
+	// changing cursor color
 	else if(key == GLFW_KEY_C && action == GLFW_PRESS){
 		float cursor_r, cursor_g, cursor_b;
 		std::cout<<"Changing the cursor color:\n";
-		std::cout<<"Enter 'r' component:";
-		std::cin>>cursor_r;
-		std::cout<<"Enter 'g' component:";
-		std::cin>>cursor_g;
-		std::cout<<"Enter 'b' component:";
-		std::cin>>cursor_b;
+		std::cout<<"Enter 'r', 'g', 'b' component:";
+		std::cin>>cursor_r>>cursor_g>>cursor_b;
 		Point updated_color(cursor_r, cursor_g, cursor_b);
 		cursor_color = updated_color;
 		std::cout<<"Cursor color changed successfully.\n";
 	}
-	else if(key == GLFW_KEY_G && action == GLFW_PRESS){
+	// saving the model
+	else if(key == GLFW_KEY_S && action == GLFW_PRESS){
         std::string fname;
         std::cout << "Enter filename to save the model:";
         std::cin >> fname;
         saveModelToFile(fname);
         std::cout << "Done!\n";
 	}
+	// resetting the grid
 	else if(key == GLFW_KEY_R && action == GLFW_PRESS){
         resetModel();
 	}
+	// loading a saved model
 	else if(key == GLFW_KEY_K && action == GLFW_PRESS){ 
         resetModel();
         std::string fname;
@@ -139,11 +157,15 @@ namespace csX75
         readModelFromFile(fname);
         std::cout << "Done!\n";
 	}
-    else if(key == GLFW_KEY_T && action == GLFW_PRESS) {
-        draw_grid = !draw_grid;
-    }
-  }
+	// switching to inspect mode
+	else if(key == GLFW_KEY_I && action == GLFW_PRESS) {
+		isInspectMode = true;
+		draw_grid = false;
+	}
+	// switching to modelling mode
+	else if(key == GLFW_KEY_M && action == GLFW_PRESS) {
+		isInspectMode = false;
+		draw_grid = true;
+	}
 };  
-  
-
-
+}  

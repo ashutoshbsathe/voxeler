@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include <GLFW/glfw3.h>
 
 float points[(N_CELLS+1)*8]; // 2*(N+1) number of lines, 2 points / line, 2 floats / point
 float grid_offsets[N_CELLS+2];

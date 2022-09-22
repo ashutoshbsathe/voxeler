@@ -28,7 +28,7 @@
 #define DRAW_MIN (-(N_CELLS*N_UNITS)/2)
 #define DRAW_MAX ((N_CELLS*N_UNITS)/2)
 
-bool persp = false, draw_grid = true;
+bool persp = false, draw_grid = true, isInspectMode = false;
 float xrot = 0, yrot = 0, zrot = 0, rotamount = glm::pi<float>() / 12; // 15 degrees
 
 float cursor_x = 0, cursor_y = 0, cursor_z = 0, moveamount = N_UNITS, cursor_max = DRAW_MAX, cursor_min = DRAW_MIN;
