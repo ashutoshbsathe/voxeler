@@ -258,7 +258,6 @@ void renderGL(void) {
 }
 
 int main(int argc, char** argv) {
-    defineGrid();
     //! The pointer to the GLFW window
     GLFWwindow* window;
 
@@ -314,17 +313,11 @@ int main(int argc, char** argv) {
     csX75::initGL();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//glBlendEquation(GL_SUBTRACT);
+    defineGrid();
     model.clear();
 
     model_triangle_list = (float *)calloc(max_num_triangles * 3 * 3, sizeof(float));
     model_triangle_colors = (float *)calloc(max_num_triangles * 3 * 3, sizeof(float));
-
-    //model_triangle_list.clear();
-    //model_triangle_colors.clear();
-
-    //cursor_triangle_list.clear();
-    //cube_triangle_colors.clear();
 
     // since model is empty it should return all triangles
     auto tmp = trianglesAt(Point(0, 0, 0), cursor_color).first;
@@ -369,64 +362,16 @@ int main(int argc, char** argv) {
         default_cursor_colors[3*i+1] = 1;
         default_cursor_colors[3*i+2] = 0;
     }
-    /*
-    for(int i = 0; i < 12; i++) {
-        std::cout << "Triangle #" << i+1 << ": [ ";
-        for(int j = 0; j < 3; j++) {
-            std::cout << "(";
-            std::cout << *((float *)cursor_triangle_list + i * 9 + j * 3);
-            std::cout << ", ";
-            std::cout << *((float *)cursor_triangle_list + i * 9 + j * 3 + 1);
-            std::cout << ", ";
-            std::cout << *((float *)cursor_triangle_list + i * 9 + j * 3 + 2);
-            std::cout << ") ";
-        }
-        std::cout << "]\n";
-    }
-    std::cout << "------------------------\n";
-    cubeAt(0, 0, 0);
-    // 12 triangles
-    for(int i = 0; i < 12; i++) {
-        // each triangle has 3 points
-        for(int j = 0; j < 3; j++) {
-          std::cout << "(" << cube_coords[i*9+j*3] << ", " << cube_coords[i*9+j*3+1] << ", " << cube_coords[i*9+j*3+2] << ")\n";
-        }
-        std::cout << "\n";
-    }
-    */
-    /*
-    printModel();
-    printTriangleList();
-    insertAt(0, 0, 0, cursor_color);
-
-    printModel();
-    printTriangleList();
-    insertAt(0, 0, N_UNITS, cursor_color);
-
-    printModel();
-    printTriangleList();
-    insertAt(N_UNITS, 0, 0, cursor_color);
-
-    printModel();
-    printTriangleList();
-    */
-    /**/
     gridInitShadersGL();
     gridInitVertexBufferGL();
     cursorInitShadersGL();
     cursorInitVertexBufferGL();
     modelInitShadersGL();
     modelInitVertexBufferGL();
-    /**/
     for(int i = 0; i < num_triangles * 3 * 3; i++) {
         std::cout << *((float *)model_triangle_list + i) << ", " << *((float *)model_triangle_colors + i) << "\n";
     }
     std::cout << "-------\nnum_triangles = " << num_triangles << "\n";
-    /*
-    for(int i = 0; i < 12 * 3 * 3; i++) {
-        std::cout << *((float *)cursor_triangle_list + i) << ", " << *((float *)cursor_colors + i) << "\n";
-    }
-    */
     // Loop until the user closes the window
     while (glfwWindowShouldClose(window) == 0) {
 
