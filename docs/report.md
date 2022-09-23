@@ -9,6 +9,20 @@ geometry:
     - right=1.5cm
 ...
 
+# Declaration
+
+> The entire code of this assignment is purely our own work and we have not taken any assistance from other students or copied the code from internet and at any point of time we both will be able to explain any part of the code that we have written.
+
+1. Ashutosh Sathe (21q050012)
+2. Animesh (21q050015)
+
+# Notation
+
+* $N$ -- The number of cells in the grid
+* $n$ -- Size of each cell
+* $D_\text{min}$ -- Minimum (WCS) coordinate of the grid on any axis (same on all axes)
+* $D_\text{max}$ -- Maximum (WCS) coordinate of the grid on any axis (same on all axes)
+
 # Drawing the grid
 
 For drawing an $N \times N \times N$ grid, we need to draw $O(N^3)$ lines. Assuming 2 points per line, 3 floating point coordinates per point, this approach will need to store $\sim 100^3 \times 2 \times 3 \times 4$ bytes just to draw grid lines ! Our implementation makes use of the inherent symmetries when drawing these grid lines to significantly reduce the memory required. We observe that in a grid line, many lines are parallel to each other and the endpoints differ only in one coordinate. Therefore, we only store points required to draw lines on X-Y plane and reuse these coordinates in various different ways to fill the complete grid. Because of this, we only require $O(N)$ memory for drawing grid as opposed to $O(N^3)$ in the naive approach.
@@ -53,7 +67,7 @@ $$
 
 This completes all the lines that need to be drawn for this $5\times 5\times 5$  grid that are parallel to $XY$ plane. Now we can use the same trick to draw lines parallel to $XZ$ and $YZ$ planes by just swapping around the coordinates. Note that for drawing lines parallel to other planes we do not need to push more points to VBO, we just need to change their ordering in the shader by accessing the `gl_InstanceID` variable. For first $N+1$ instances, we use the uniform array value as the $z$ while using the VBO information as $x, y$. For next $N+1$ instances, we use the uniform array value as the $x$ value while the VBO information as $y, z$ and for the last $N+1$ instances, we use the uniform array value as $y$ value while interpreting the VBO information as $x, z$.
 
-Overall, we use `glDrawArraysInstanced(GL_LINES, 0, 2*(N+1), 3*(N+1))` to draw the entire grid in one draw call while storing only $O(N)$ points in the VBO.
+Overall, we use `glDrawArraysInstanced(GL_LINES, 0, 2*(N+1), 3*(N+1))` to draw the entire grid in one draw call while storing only $O(N)$ points in the VBO. We also use transparency and enable blending in order to lessen the obstruction effect of the grid.
 
 <!--
 * Usually for drawing a `NxNxN` grid one may need to define `2*(N^N^N)` vertices in the grid_vbo (for storing both `x&y` coords.), but here in this implementation we have tried to reduce the memory overhead from the graphics memory by using the `glDrawArraysInstanced()` function to draw the grid lines instead of using `glDrawArrays()`. This approach helped us to hugely reduce the memory overhead from `O(N^N^N)` to `O(N)`.
@@ -79,6 +93,8 @@ Overall, we use `glDrawArraysInstanced(GL_LINES, 0, 2*(N+1), 3*(N+1))` to draw t
 -->
 
 # Drawing the cursor cube
+
+![Cube notation used throughout the assignment. Notice that triangles on opposite faces have same order of vertices so that they can be matched](cursor-cube.pdf)
 
 Idea behind drawing the cursor cube was very similar to [`Tutorial_02`](https://github.com/paragchaudhuri/cs475-tutorials/tree/master/Tutorial_02). However, the main difference is that cube will be moving around the grid. We maintain a global position of cursor using 3 floating point numbers `cursor_x`, `cursor_y`, `cursor_z`. These point to the left-bottom-back coordinate of the cube that cursor is currently on. First, we create a static cube such that `cursor_x = cursor_y = cursor_z = 0` and push it to VBO. Then we use callbacks to listen to relevant keypresses and update these values accordingly. For every subsequent render of the cursor cube, we simply add the `[cursor_x, cursor_y, cursor_z]` vector to each vertex of the cube to get the current (and correctly translated) version of cube. Since this translation vector is common to all vertices, we pass it as a uniform to the vertex shader.
 
@@ -114,7 +130,7 @@ $$
 \text{trianglesList} \leftarrow \text{trianglesList} - \text{addList} + \text{removeList}
 $$
 
-To continue the last example, let's say now we remove the cube inserted at $(0, 0, n)$ then not only do we have to remove the faces corresponding to 5 faces of the cube but we must make the left face of the cube at $(0, 0, 0)$ visible again.
+To continue the last example, let's say now we remove the cube inserted at $(0, 0, n)$ then not only do we have to remove the faces corresponding to 5 faces of the cube but we must make the left face of the cube at $(0, 0, 0)$ visible again. To make sure that triangles on opposite faces match, we make sure that ordering of vertices in the triangles on opposite faces is same.
 
 With this kind of insertion or deletion, we are guaranteed that in case of model with 1M blocks, only $6 \times 2 \times 100 \times 100$ triangles will be visible at any given time. Despite this, the user may delete or insert the cube at the center of the model which is not visible through any of the sides. Therefore, we must overestimate the number of triangles in order to prevent out-of-memory errors.
 
@@ -127,3 +143,13 @@ This gives maximum amount of memory we need for storing triangle data as $2\time
 Saving requires us to store all the cubes in lexicographic order. This requirement is satisfied for free since C++ `std::map` stores data in lexicographic order of keys (which are `Point` instances in our case) by default ! Saving simply enumerates over all of the cubes and writes their information on every line. We also additionally store the value of $N$ on the very first line. This value of $N$ can be useful (although we did not implement it) to center small models into larger models and also detecting whether user is loading a larger model into smaller grid.
 
 Loading procedure is similar to inserting a single cube except done for collection of all cubes after they have been read from the file. We also utilize the value of $N$ read from the first line of the file to warn user about potentially loading a larger model in smaller grid size. If any of the model blocks are outside the grid boundaries, we simply ignore such blocks and notify the user.
+
+# References
+
+* Using multiple shaders in OpenGL -- [https://gamedev.stackexchange.com/questions/22216/using-multiple-shaders](https://gamedev.stackexchange.com/questions/22216/using-multiple-shaders)
+* Instanced drawing in OpenGL -- 
+    1. [https://learnopengl.com/Advanced-OpenGL/Instancing](https://learnopengl.com/Advanced-OpenGL/Instancing)
+    2. [https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArraysInstanced.xhtml](https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawArraysInstanced.xhtml)
+* Efficient meshing -- [https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/](https://0fps.net/2012/06/30/meshing-in-a-minecraft-game/)
+* Blending -- [https://learnopengl.com/Advanced-OpenGL/Blending](https://learnopengl.com/Advanced-OpenGL/Blending)
+* Face-culling -- [https://learnopengl.com/Advanced-OpenGL/Face-culling](https://learnopengl.com/Advanced-OpenGL/Face-culling)
