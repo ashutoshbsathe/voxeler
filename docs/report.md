@@ -13,10 +13,49 @@ geometry:
 
 For drawing an $N \times N \times N$ grid, we need to draw $O(N^3)$ lines. Assuming 2 points per line, 3 floating point coordinates per point, this approach will need to store $\sim 100^3 \times 2 \times 3 \times 4$ bytes just to draw grid lines ! Our implementation makes use of the inherent symmetries when drawing these grid lines to significantly reduce the memory required. We observe that in a grid line, many lines are parallel to each other and the endpoints differ only in one coordinate. Therefore, we only store points required to draw lines on X-Y plane and reuse these coordinates in various different ways to fill the complete grid. Because of this, we only require $O(N)$ memory for drawing grid as opposed to $O(N^3)$ in the naive approach.
 
+```{.matplotlib format=PDF caption="Illustration of instanced drawing for $N=5$, instances = 5"}
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.set(proj_type='persp')
+xs = np.arange(1,11,1)
+ys = np.ones_like(xs)
+zs = np.ones_like(xs)
+colors = ['r', 'g', 'k', 'y', 'b', 'c']
+for j in range(5):
+    for i in range(5):
+        ax.plot(xs,ys+i*2, zs+j*2, c=colors[j])
+
+#elevatoion=7, azimuth=-67, roll=0
+ax.view_init(7,-67)
+ax.set_xlim((0,11))
+ax.set_ylim((0,11))
+ax.set_zlim((0,11))
+ax.grid(False)
+
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_zticks([])
+
+fig.tight_layout()
+```
+
+Figure above shows our approach for $N=5$. We only store coordinates to draw red colored lines in the VBO. To draw next set of lines (green, black, yellow and blue), we can use these exact same points in $(x, y)$ but we must draw them at some $z$ height. We pass this offset $z$ information via a uniform type of shader variable where offset of $i^\text{th}$ line is calculated as follows:
+
+
 $$
 \text{offset}_i = D_{\text{min}} + \frac{i-1}{N} D_{\text{max}}
 $$
 
+This completes all the lines that need to be drawn for this $5\times 5\times 5$  grid that are parallel to $XY$ plane. Now we can use the same trick to draw lines parallel to $XZ$ and $YZ$ planes by just swapping around the coordinates. Note that for drawing lines parallel to other planes we do not need to push more points to VBO, we just need to change their ordering in the shader by accessing the `gl_InstanceID` variable. For first $N+1$ instances, we use the uniform array value as the $z$ while using the VBO information as $x, y$. For next $N+1$ instances, we use the uniform array value as the $x$ value while the VBO information as $y, z$ and for the last $N+1$ instances, we use the uniform array value as $y$ value while interpreting the VBO information as $x, z$.
+
+Overall, we use `glDrawArraysInstanced(GL_LINES, 0, 2*(N+1), 3*(N+1))` to draw the entire grid in one draw call while storing only $O(N)$ points in the VBO.
+
+<!--
 * Usually for drawing a `NxNxN` grid one may need to define `2*(N^N^N)` vertices in the grid_vbo (for storing both `x&y` coords.), but here in this implementation we have tried to reduce the memory overhead from the graphics memory by using the `glDrawArraysInstanced()` function to draw the grid lines instead of using `glDrawArrays()`. This approach helped us to hugely reduce the memory overhead from `O(N^N^N)` to `O(N)`.
 
 
@@ -37,15 +76,15 @@ $$
 * While drawing the grid-lines, we first started with the horizontal lines in `x-z` plane, later we are rotating the lines by `90 degrees` to draw vertical lines in the `x-z` plane. This procedure draws a 2D grid in `x-z` plane, which is finally repeated in other `y` axis values to fill the whole 3D volume.
 
 * Plots representing drawing of the grid lines:
+-->
 
-
-# Drawing cursor cube
+# Drawing the cursor cube
 
 Idea behind drawing the cursor cube was very similar to [`Tutorial_02`](https://github.com/paragchaudhuri/cs475-tutorials/tree/master/Tutorial_02). However, the main difference is that cube will be moving around the grid. We maintain a global position of cursor using 3 floating point numbers `cursor_x`, `cursor_y`, `cursor_z`. These point to the left-bottom-back coordinate of the cube that cursor is currently on. First, we create a static cube such that `cursor_x = cursor_y = cursor_z = 0` and push it to VBO. Then we use callbacks to listen to relevant keypresses and update these values accordingly. For every subsequent render of the cursor cube, we simply add the `[cursor_x, cursor_y, cursor_z]` vector to each vertex of the cube to get the current (and correctly translated) version of cube. Since this translation vector is common to all vertices, we pass it as a uniform to the vertex shader.
 
 When the cursor cube is on a filled cell, we need to make it bigger for better visualization. To achieve this, we created one more cube which is larger than the standard cube. Our method of translating the cube using uniforms is still compatible with this larger version of cube since the larger cube's center is same as standard cube's center. Now we have 2 cubes -- 1 standard and 1 larger. To switch between these, we simply maintain a pointer to their base addresses. If we detect that cube's state has changed (non-filled to filled or vice versa) then we update the pointer accordingly and refresh VBO to load the correct version of cube. We also maintain a similar pointer for color attributes which by default points to default bright green color or points to model's color when the cube is on a filled cell.
 
-# Drawing model
+# Drawing the model
 
 **Representation:** 
 
