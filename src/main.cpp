@@ -340,7 +340,7 @@ int main(int argc, char** argv) {
         padded_cursor_triangle_list[i][2][0] = CURSOR_PADDING * tmp[i].p3.x + offset;
         padded_cursor_triangle_list[i][2][1] = CURSOR_PADDING * tmp[i].p3.y + offset;
         padded_cursor_triangle_list[i][2][2] = CURSOR_PADDING * tmp[i].p3.z + offset;
-		}
+	}
    
 	for(int i = 0; i < 36; i++) {
         default_cursor_colors[3*i] = 0;
