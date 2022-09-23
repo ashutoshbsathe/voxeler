@@ -154,6 +154,7 @@ Loading procedure is similar to inserting a single cube except done for collecti
 
 # References
 
+* OpenGL tutorials -- [https://github.com/paragchaudhuri/cs475-tutorials](https://github.com/paragchaudhuri/cs475-tutorials)
 * Using multiple shaders in OpenGL -- [https://gamedev.stackexchange.com/questions/22216/using-multiple-shaders](https://gamedev.stackexchange.com/questions/22216/using-multiple-shaders)
 * Instanced drawing in OpenGL -- 
     1. [https://learnopengl.com/Advanced-OpenGL/Instancing](https://learnopengl.com/Advanced-OpenGL/Instancing)
