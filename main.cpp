@@ -226,8 +226,6 @@ void renderGL(void) {
         glBindBuffer (GL_ARRAY_BUFFER, cursor_vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, 36 * 3 * sizeof(float), cursor_triangle_list);
         glBufferSubData(GL_ARRAY_BUFFER, 36 * 3 * sizeof(float), 36 * 3 * sizeof(float), cursor_colors);
-        std::cout << "Drawing cursor with color: " << cursor_colors[0] << ", " << cursor_colors[1] << ", " << cursor_colors[2] << "\n";
-        std::cout << "First point: " << cursor_triangle_list[0] << ", " << cursor_triangle_list[1] << ", " << cursor_triangle_list[2] << "\n";
         update_cursor_vbo = false;
     }
     glUniform3f(cursor_offset_id, cursor_x, cursor_y, cursor_z);
@@ -242,7 +240,6 @@ void renderGL(void) {
         glBufferSubData(GL_ARRAY_BUFFER, 0, num_triangles * 3 * 3 * sizeof(float), model_triangle_list);
         glBufferSubData(GL_ARRAY_BUFFER, max_num_triangles * 3 * 3 * sizeof(float), num_triangles * 3 * 3 * sizeof(float), model_triangle_colors);
         update_model_vbo = false;
-        std::cout << "num_triangles = " << num_triangles << "\n";
     }
     glUniformMatrix4fv(model_uModelViewProjectMatrix_id, 1, GL_FALSE, glm::value_ptr(modelviewproject_matrix)); // value_ptr needed for proper pointer conversion
     glDrawArrays(GL_TRIANGLES, 0, num_triangles * 3);
@@ -296,10 +293,10 @@ int main(int argc, char** argv) {
     }
 
     //Print and see what context got enabled
-    std::cout<<"Vendor: "<<glGetString (GL_VENDOR)<<std::endl;
-    std::cout<<"Renderer: "<<glGetString (GL_RENDERER)<<std::endl;
-    std::cout<<"Version: "<<glGetString (GL_VERSION)<<std::endl;
-    std::cout<<"GLSL Version: "<<glGetString (GL_SHADING_LANGUAGE_VERSION)<<std::endl;
+  	std::cout<<"Vendor: "<<glGetString (GL_VENDOR)<<std::endl;
+  	std::cout<<"Renderer: "<<glGetString (GL_RENDERER)<<std::endl;
+  	std::cout<<"Version: "<<glGetString (GL_VERSION)<<std::endl;
+  	std::cout<<"GLSL Version: "<<glGetString (GL_SHADING_LANGUAGE_VERSION)<<std::endl;
 
     //Keyboard Callback
     glfwSetKeyCallback(window, csX75::key_callback);
@@ -333,7 +330,6 @@ int main(int argc, char** argv) {
         default_cursor_triangle_list[i][2][2] = tmp[i].p3.z;
 
         float offset = (1. - CURSOR_PADDING) * N_UNITS / 2.;
-        std::cout << "offset = " << offset << "\n";
 
         padded_cursor_triangle_list[i][0][0] = CURSOR_PADDING * tmp[i].p1.x + offset;
         padded_cursor_triangle_list[i][0][1] = CURSOR_PADDING * tmp[i].p1.y + offset;
@@ -344,34 +340,21 @@ int main(int argc, char** argv) {
         padded_cursor_triangle_list[i][2][0] = CURSOR_PADDING * tmp[i].p3.x + offset;
         padded_cursor_triangle_list[i][2][1] = CURSOR_PADDING * tmp[i].p3.y + offset;
         padded_cursor_triangle_list[i][2][2] = CURSOR_PADDING * tmp[i].p3.z + offset;
-
-        std::cout<<"[ ";
-        std::cout<< "(" << tmp[i].p1.x << " " << tmp[i].p1.y << " " << tmp[i].p1.z << ") ";
-        std::cout<< "(" << tmp[i].p2.x << " " << tmp[i].p2.y << " " << tmp[i].p2.z << ") ";
-        std::cout<< "(" << tmp[i].p3.x << " " << tmp[i].p3.y << " " << tmp[i].p3.z << ") ";
-        std::cout<<"]\n";
-        std::cout<<"[ ";
-        std::cout<< "(" << CURSOR_PADDING * tmp[i].p1.x + offset << " " << CURSOR_PADDING * tmp[i].p1.y + offset << " " << CURSOR_PADDING * tmp[i].p1.z + offset << ") ";
-        std::cout<< "(" << CURSOR_PADDING * tmp[i].p2.x + offset << " " << CURSOR_PADDING * tmp[i].p2.y + offset << " " << CURSOR_PADDING * tmp[i].p2.z + offset << ") ";
-        std::cout<< "(" << CURSOR_PADDING * tmp[i].p3.x + offset << " " << CURSOR_PADDING * tmp[i].p3.y + offset << " " << CURSOR_PADDING * tmp[i].p3.z + offset << ") ";
-        std::cout<<"]\n";
-        std::cout<<"--------------\n";
-    }
-    for(int i = 0; i < 36; i++) {
+		}
+   
+	for(int i = 0; i < 36; i++) {
         default_cursor_colors[3*i] = 0;
         default_cursor_colors[3*i+1] = 1;
         default_cursor_colors[3*i+2] = 0;
     }
+
     gridInitShadersGL();
     gridInitVertexBufferGL();
     cursorInitShadersGL();
     cursorInitVertexBufferGL();
     modelInitShadersGL();
     modelInitVertexBufferGL();
-    for(int i = 0; i < num_triangles * 3 * 3; i++) {
-        std::cout << *((float *)model_triangle_list + i) << ", " << *((float *)model_triangle_colors + i) << "\n";
-    }
-    std::cout << "-------\nnum_triangles = " << num_triangles << "\n";
+
     // Loop until the user closes the window
     while (glfwWindowShouldClose(window) == 0) {
 

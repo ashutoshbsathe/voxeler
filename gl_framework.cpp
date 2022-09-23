@@ -151,11 +151,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     else if(key == GLFW_KEY_I && action == GLFW_PRESS) {
         isInspectMode = true;
         draw_grid = false;
+		std::cout<<"-------Inspect Mode-------\n";
     }
     // switching to modelling mode
     else if(key == GLFW_KEY_M && action == GLFW_PRESS) {
         isInspectMode = false;
         draw_grid = true;
+		std::cout<<"------Modelling Mode------\n";
     }
 };
 }
