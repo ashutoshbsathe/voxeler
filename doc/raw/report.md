@@ -16,6 +16,10 @@ geometry:
 1. Ashutosh Sathe (21q050012)
 2. Animesh (21q050015)
 
+# Screenshots of rendered models
+
+![Top row: Model 1 -- House, Bottom row: Model 2 -- Table](screenshots.jpg)
+
 # Notation
 
 * $N$ -- The number of cells in the grid
