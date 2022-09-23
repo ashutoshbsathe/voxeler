@@ -72,3 +72,17 @@ $$
 \text{removeAt}(x, y, z):\;\;\;\;\text{addSet}, \text{removeSet} = \text{trianglesAt}(x, y, z), \;
 \text{trianglesList} \leftarrow \text{trianglesList} - \text{addSet} + \text{removeSet}
 $$
+
+To continue the last example, let's say now we remove the cube inserted at $(0, 0, n)$ then not only do we have to remove the faces corresponding to 5 faces of the cube but we must make the left face of the cube at $(0, 0, 0)$ visible again.
+
+With this kind of insertion or deletion, we are guaranteed that in case of model with 1M blocks, only $6 \times 2 \times 100 \times 100$ triangles will be visible at any given time. Despite this, the user may delete or insert the cube at the center of the model which is not visible through any of the sides. Therefore, we must overestimate the number of triangles in order to prevent out-of-memory errors.
+
+For this, consider any face of the cube. Maximum of $N\times N$ quads are visible to us. But this face can be hollow from inside which can lead to a similar quad of size $(N-1)\times(N-1)$ visible from the inside. This can be further extended to get total number of "maybe-visible" (not from a visibility sense but from our algorithm which considers visibility through neighbors) will be $n^2 + (n-1)^2 + \dots = \sum_{j=1}^nj^2 = n(n+1)(2n+1)/6$. Therefore, total number of triangles $=2n(n+1)(2n+1)$ since there are 6 faces to a cube and 2 triangles/quad. 
+
+This gives maximum amount of memory we need for storing triangle data as $2\times 100\times 101\times 201\times 3\times 3\times 4 \approx 140\text{MB}$ of RAM. The same amount will also be required to store colors. This means the maximum amount of RAM required in our approach is $\approx 280\text{MB}$ which is much better than $\approx 800\text{MB}$ requirement of naive approach.
+
+**Saving/Loading:**
+
+Saving requires us to store all the cubes in lexicographic order. This requirement is satisfied for free since C++ `std::map` stores data in lexicographic order of keys (which are `Point` instances in our case) by default ! Saving simply enumerates over all of the cubes and writes their information on every line. We also additionally store the value of $N$ on the very first line. This value of $N$ can be useful (although we did not implement it) to center small models into larger models and also detecting whether user is loading a larger model into smaller grid.
+
+Loading procedure is similar to inserting a single cube except done for collection of all cubes after they have been read from the file. We also utilize the value of $N$ read from the first line of the file to warn user about potentially loading a larger model in smaller grid size. If any of the model blocks are outside the grid boundaries, we simply ignore such blocks and notify the user.
