@@ -354,6 +354,8 @@ int main(int argc, char** argv) {
     cursorInitVertexBufferGL();
     modelInitShadersGL();
     modelInitVertexBufferGL();
+    
+    std::cout<<"------Modelling Mode------\n";
 
     // Loop until the user closes the window
     while (glfwWindowShouldClose(window) == 0) {
