@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define X 3
-#define Y 4
+#define X 3 
+#define Y 4 
 #define Z 5
 #define ARR(i,j,k) (b[Y*Z*i + Z*j + k])
 int main() {

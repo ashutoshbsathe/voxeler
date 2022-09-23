@@ -7,9 +7,9 @@
 struct Triangle {
     std::string tri_str;
     Point p1, p2, p3;
-    Point c;
+	Point c;
     Triangle(Point p1, Point p2, Point p3, Point c);
-    struct Triangle withColor(Point color);
+	struct Triangle withColor(Point color);
     bool operator<(const struct Triangle &t) const;
     bool operator==(const struct Triangle &t) const;
     struct HashTriangle {

@@ -26,9 +26,9 @@ extern float moveamount, cursor_min, cursor_max, cursor_x, cursor_y, cursor_z, c
 extern Point cursor_color;
 extern void insertAtCursor();
 
-void printTriangleList();
+void printTriangleList(); 
 
-void printModel();
+void printModel(); 
 
 std::pair<std::vector<Triangle>, std::vector<Triangle>> trianglesAt(Point c, Point cubeColor);
 
@@ -38,7 +38,7 @@ void insertAt(float x, float y, float z, Point cubeColor);
 
 void deleteAt(float x, float y, float z);
 
-void saveModelToFile(std::string fname);
+void saveModelToFile(std::string fname); 
 
 void readModelFromFile(std::string fname);
 #endif
