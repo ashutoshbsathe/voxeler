@@ -20,6 +20,10 @@ geometry:
 
 ![Top row: Model 1 -- House, Bottom row: Model 2 -- Table](screenshots.jpg)
 
+# Additional functionality
+
+Pressing "v/V" switches the projection matrix between orthographic and perspective projection. In the screenshots above, left 2 columns are with orthographic projection while the right 2 columns are with perspective projection. Many of the hyperparameters such as $N$, $n$ are also configurable via `main.hpp`. If $N$ was changed to be more than $100$, `grid_vs.glsl` should also reflect that change.
+
 # Notation
 
 * $N$ -- The number of cells in the grid
@@ -100,7 +104,7 @@ Overall, we use `glDrawArraysInstanced(GL_LINES, 0, 2*(N+1), 3*(N+1))` to draw t
 
 ![Cube notation used throughout the assignment. Notice that triangles on opposite faces have same order of vertices so that they can be matched](cursor-cube.pdf)
 
-Idea behind drawing the cursor cube was very similar to [`Tutorial_02`](https://github.com/paragchaudhuri/cs475-tutorials/tree/master/Tutorial_02). However, the main difference is that cube will be moving around the grid. We maintain a global position of cursor using 3 floating point numbers `cursor_x`, `cursor_y`, `cursor_z`. These point to the left-bottom-back coordinate of the cube that cursor is currently on. First, we create a static cube such that `cursor_x = cursor_y = cursor_z = 0` and push it to VBO. Then we use callbacks to listen to relevant keypresses and update these values accordingly. For every subsequent render of the cursor cube, we simply add the `[cursor_x, cursor_y, cursor_z]` vector to each vertex of the cube to get the current (and correctly translated) version of cube. Since this translation vector is common to all vertices, we pass it as a uniform to the vertex shader.
+Idea behind drawing the cursor cube was very similar to [`Tutorial_02`](https://github.com/paragchaudhuri/cs475-tutorials/tree/master/Tutorial_02). However, the main difference is that cube will be moving around the grid. We maintain a global position of cursor using 3 floating point numbers `cursor_x`, `cursor_y`, `cursor_z`. These point to the left-bottom-back coordinate of the cube (point $c$ in Fig. 3) that cursor is currently on. First, we create a static cube such that `cursor_x = cursor_y = cursor_z = 0` and push it to VBO. Then we use callbacks to listen to relevant keypresses and update these values accordingly. For every subsequent render of the cursor cube, we simply add the `[cursor_x, cursor_y, cursor_z]` vector to each vertex of the cube to get the current (and correctly translated) version of cube. Since this translation vector is common to all vertices, we pass it as a uniform to the vertex shader.
 
 When the cursor cube is on a filled cell, we need to make it bigger for better visualization. To achieve this, we created one more cube which is larger than the standard cube. Our method of translating the cube using uniforms is still compatible with this larger version of cube since the larger cube's center is same as standard cube's center. Now we have 2 cubes -- 1 standard and 1 larger. To switch between these, we simply maintain a pointer to their base addresses. If we detect that cube's state has changed (non-filled to filled or vice versa) then we update the pointer accordingly and refresh VBO to load the correct version of cube. We also maintain a similar pointer for color attributes which by default points to default bright green color or points to model's color when the cube is on a filled cell.
 
@@ -108,26 +112,26 @@ When the cursor cube is on a filled cell, we need to make it bigger for better v
 
 **Representation:** 
 
-A model is simply a list of cube coordinates and their corresponding colors. We characterize each cube by its left-bottom-back coordinate and only store that in the model. C++-wise, this is simply a `std::map` which maps a `Point` (custom datatype similar to `glm::vec3`) representing left-bottom-back coordinate of a cube to a `Point` which represents color of that particular cube. The `Point` in key stores the $(x, y, z); x,y,z \in [D_\text{min}, D_\text{max}]$ coordinates while `Point` in value stores $(r, g, b); r,g,b \in [0, 1]$ values.
+A model is simply a list of cube coordinates and their corresponding colors. We characterize each cube by its left-bottom-back coordinate (i.e. point $c$ in Fig. 3) and only store that in the model. C++-wise, this is simply a `std::map` which maps a `Point` (custom datatype similar to `glm::vec3`) representing left-bottom-back coordinate of a cube to a `Point` which represents color of that particular cube. The `Point` in key stores the $(x, y, z); x,y,z \in [D_\text{min}, D_\text{max}]$ coordinates while `Point` in value stores $(r, g, b); r,g,b \in [0, 1]$ values.
 
 **Drawing:** 
 
 To draw multiple cubes, we can simply generate 12 triangles for each cube, push them to VBO along with their colors and simply do `glDrawArrays(GL_TRIANGLES, ...)`. However, this naive approach requires a lot of memory. In the worst case, when all 1M blocks are filled, we will be storing 12M triangles ! While modern GPUs can easily push billions of triangles, we will certainly be doing a lot of unnecessary work and occupy a lot of memory. Each triangle has 3 vertices, each vertex has 3 floating point coordinates which means this approach requires $12 \times 100^3 \times 3 \times 3 \times 4 \approx 400\text{MB}$ of RAM just to store triangle coordinates. The exact same amount of RAM will also be required to store triangle colors (each vertex has 3 colors which are floating point as well) which means in total the program will require 800MB RAM to draw the $100\times 100\times 100$ cube.
 
-We reduce these requirements significantly by observing that when 2 cubes are adjacent to each other, the faces where they meet each other are never seen under any viewing conditions. This means that we do not need to store triangles corresponding to these faces in the VBO at all ! We maintain a list of maybe-visible triangles and only pass that to the rasterizer to rasterize. A similar list is maintained which stores the colors of the corresponding triangles.
+We reduce these requirements significantly by observing that when 2 cubes are adjacent to each other, the faces where they meet each other are never seen under any viewing conditions. This means that we do not need to store triangles corresponding to these faces in the VBO at all ! We maintain a list of "maybe-visible" triangles and only pass these triangles to the rasterizer to rasterize. A similar list is maintained which stores the colors of the corresponding triangles.
 
 **Insertion/Deletion:**
 
 ![Maintaining the list of triangles with insert/delete](insert-delete.pdf)
 
-Insertion/deletion of a cube uses a neat geometric observation. Let's say there's a cube at origin $(0, 0, 0)$ and we want to add a cube at $(0, 0, n)$. Here, the right face of cube at $(0, 0, 0)$ and the left face of the cube we want to add $(0, 0, n)$ coincide. As explained above, we will not store triangles for these coinciding faces in the VBO and therefore we must remove triangles for left face of $(0, 0, 0)$ from the existing list of triangles. To complete the addition of $(0, 0, n)$, we will add triangles corresponding to the remaining 5 faces of the cube at $(0, 0, n)$ since they do not coicide with any other cube. We can represent this operation as :
+Insertion/deletion of a cube uses a neat geometric observation. Let's say there's a cube at origin $(0, 0, 0)$ and we want to add a cube at $(0, 0, n)$. Here, the right face of cube at $(0, 0, 0)$ and the left face of the cube we want to add $(0, 0, n)$ coincide. As explained above, we will not store triangles for these coinciding faces in the VBO and therefore we must remove triangles for right face of $(0, 0, 0)$ from the existing list of triangles. To complete the addition of $(0, 0, n)$, we will add triangles corresponding to the remaining 5 faces of the cube at $(0, 0, n)$ since they do not coincide with any other cube. We can represent this operation as :
 
 $$
 \text{insertAt}(x, y, z):\;\;\;\;\text{addList}, \text{removeList} = \text{trianglesAt}(x, y, z), \;
 \text{trianglesList} \leftarrow \text{trianglesList} - \text{removeList} + \text{addList}
 $$
 
-Since, the world is completely voxelized and that $\text{addList} \cup \text{removeList} = \text{allTriangles}, \text{addList} \cap \text{removeList} = \phi$ while removing the cube from $(x, y, z)$ we can just swap $\text{removeList}$ and $\text{addList}$ to get the desired result. Note that here $\text{allTriangles}$ represents the full list of 12 triangles corresponding to 6 faces of the cube.
+Since, the world is completely voxelized and that $\text{addList} \cup \text{removeList} = \text{allTriangles}, \text{addList} \cap \text{removeList} = \phi$ while removing the cube from $(x, y, z)$ we can just swap $\text{removeList}$ and $\text{addList}$ to get the desired result (Fig. 4). Note that here $\text{allTriangles}$ represents the full list of 12 triangles corresponding to 6 faces of the cube.
 
 $$
 \text{removeAt}(x, y, z):\;\;\;\;\text{addList}, \text{removeList} = \text{trianglesAt}(x, y, z), \;
