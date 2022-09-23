@@ -62,15 +62,15 @@ We reduce these requirements significantly by observing that when 2 cubes are ad
 Insertion/deletion of a cube uses a neat geometric observation. Let's say there's a cube at origin $(0, 0, 0)$ and we want to add a cube at $(0, 0, n)$. Here, the right face of cube at $(0, 0, 0)$ and the left face of the cube we want to add $(0, 0, n)$ coincide. As explained above, we will not store triangles for these coinciding faces in the VBO and therefore we must remove triangles for left face of $(0, 0, 0)$ from the existing list of triangles. To complete the addition of $(0, 0, n)$, we will add triangles corresponding to the remaining 5 faces of the cube at $(0, 0, n)$ since they do not coicide with any other cube. We can represent this operation as :
 
 $$
-\text{insertAt}(x, y, z):\;\;\;\;\text{addSet}, \text{removeSet} = \text{trianglesAt}(x, y, z), \;
-\text{trianglesList} \leftarrow \text{trianglesList} - \text{removeSet} + \text{addSet}
+\text{insertAt}(x, y, z):\;\;\;\;\text{addList}, \text{removeList} = \text{trianglesAt}(x, y, z), \;
+\text{trianglesList} \leftarrow \text{trianglesList} - \text{removeList} + \text{addList}
 $$
 
-Since, the world is completely voxelized and that $\text{addSet} \cup \text{removeSet} = \text{allTriangles}, \text{addSet} \cap \text{removeSet} = \phi$ while removing the cube from $(x, y, z)$ we can just swap $\text{removeSet}$ and $\text{addSet}$ to get the desired result. Note that here $\text{allTriangles}$ represents the full list of 12 triangles corresponding to 6 faces of the cube.
+Since, the world is completely voxelized and that $\text{addList} \cup \text{removeList} = \text{allTriangles}, \text{addList} \cap \text{removeList} = \phi$ while removing the cube from $(x, y, z)$ we can just swap $\text{removeList}$ and $\text{addList}$ to get the desired result. Note that here $\text{allTriangles}$ represents the full list of 12 triangles corresponding to 6 faces of the cube.
 
 $$
-\text{removeAt}(x, y, z):\;\;\;\;\text{addSet}, \text{removeSet} = \text{trianglesAt}(x, y, z), \;
-\text{trianglesList} \leftarrow \text{trianglesList} - \text{addSet} + \text{removeSet}
+\text{removeAt}(x, y, z):\;\;\;\;\text{addList}, \text{removeList} = \text{trianglesAt}(x, y, z), \;
+\text{trianglesList} \leftarrow \text{trianglesList} - \text{addList} + \text{removeList}
 $$
 
 To continue the last example, let's say now we remove the cube inserted at $(0, 0, n)$ then not only do we have to remove the faces corresponding to 5 faces of the cube but we must make the left face of the cube at $(0, 0, 0)$ visible again.
