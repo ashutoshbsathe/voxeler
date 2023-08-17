@@ -1,4 +1,8 @@
-# Assignment 1 -- Voxelized Modeling
+# voxeler
+
+A voxelized modeler (similar to Minecraft's creative mode) written in pure C++ and OpenGL. Part of CS675 - Computer Graphics course at IIT Bombay. Please see the report for more details.
+
+## Assignment 1 -- Voxelized Modeling
 
 Declaration:
 
